@@ -1,0 +1,22 @@
+---
+description: StreamList React Native — API, theme, hooks, TypeScript, navigation, state, and styling constraints
+alwaysApply: true
+---
+
+# StreamList project rules
+
+1. All API calls must go through `src/api/client.ts` only. Never import Axios directly in any hook or component.
+2. All color values must come from `src/theme/colors.ts`. No hardcoded hex strings anywhere in component or screen files.
+3. All spacing values must come from `src/theme/spacing.ts`. No hardcoded pixel numbers in StyleSheet files.
+4. Every screen must fetch data exclusively through a custom hook. No inline `useEffect` + `fetch` or `useEffect` + `axios` inside screen components.
+5. Every custom data-fetching hook must return exactly this shape: `{ data, loading, error, refetch }`. No other shape is permitted.
+6. No `any` types anywhere. TypeScript strict mode is enforced.
+7. No third-party UI component libraries. No React Native Paper, Elements, or similar.
+8. No CSS-in-JS. No NativeWind, Styled Components, or similar.
+9. No navigation library other than React Navigation v6.
+10. No state management library other than Zustand.
+11. Never use a 1px solid border at full opacity. Boundaries are created through background color shifts or spacing only.
+12. Never hardcode the TMDB API token in any source file. It must come from environment variables only.
+13. All navigation params must be typed using the interfaces in `src/navigation/types.ts`. No untyped `navigation.navigate()` calls.
+14. No Redux, MobX, or any state library other than Zustand.
+15. StyleSheet.create() only for styling. No inline style objects except for dynamic values.
