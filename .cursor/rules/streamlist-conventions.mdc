@@ -20,3 +20,13 @@ alwaysApply: true
 13. All navigation params must be typed using the interfaces in `src/navigation/types.ts`. No untyped `navigation.navigate()` calls.
 14. No Redux, MobX, or any state library other than Zustand.
 15. StyleSheet.create() only for styling. No inline style objects except for dynamic values.
+16. Never use ScrollView for content rows that need infinite scroll. Always use FlatList for horizontal movie/content rows.
+17. Genre selection state must always stay inside the useHome hook as local component state. Never put genre selection in Zustand store.
+18. Never hardcode any hex color value in any component, screen, or hook file. Every color must be imported from src/theme/colors.ts.
+19. Never hardcode any spacing or pixel value in StyleSheet. Every spacing value must come from src/theme/spacing.ts.
+20. ContentCard must always handle null poster_path gracefully by showing a dark placeholder. Never pass a null or undefined source to an Image component.
+21. Every FlatList content row must implement onEndReached for infinite scroll with onEndReachedThreshold={0.3}.
+22. Every async section must show SkeletonCard components while loading — never use ActivityIndicator or spinner for content rows.
+23. Never cancel a previous API call by ignoring the response silently. Use a ref-based isMounted check or track the current genreId to prevent stale state updates.
+24. All navigation.navigate() calls must use fully typed params from src/navigation/types.ts. Never pass untyped route params.
+25. DetailScreen must never show the bottom tab bar. It is a stack screen pushed over the tabs.

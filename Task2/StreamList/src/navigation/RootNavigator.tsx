@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   },
   tabBarTint: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.tab_bar_overlay,
+    backgroundColor: colors.surface,
   },
   tabBarIconText: {
     ...typography.title_lg,
