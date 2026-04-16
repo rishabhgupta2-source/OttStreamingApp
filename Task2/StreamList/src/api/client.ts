@@ -4,6 +4,13 @@ import axios, {
 } from 'axios';
 import { TMDB_ACCESS_TOKEN, TMDB_BASE_URL } from '@env';
 
+function readBearerToken(): string {
+  if (typeof TMDB_ACCESS_TOKEN !== 'string') {
+    return '';
+  }
+  return TMDB_ACCESS_TOKEN.trim();
+}
+
 type RequestConfigWithRetry = InternalAxiosRequestConfig & {
   __retryCount?: number;
 };
@@ -57,7 +64,10 @@ const client = axios.create({
 });
 
 client.interceptors.request.use((config) => {
-  config.headers.Authorization = `Bearer ${TMDB_ACCESS_TOKEN}`;
+  const token = readBearerToken();
+  if (token.length > 0) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 

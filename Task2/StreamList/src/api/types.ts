@@ -1,8 +1,3 @@
-export interface Genre {
-  id: number;
-  name: string;
-}
-
 export interface Movie {
   id: number;
   title: string;
@@ -12,6 +7,22 @@ export interface Movie {
   release_date: string;
   genre_ids: number[];
   overview: string;
+}
+
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+export interface PaginatedResponse<T> {
+  page: number;
+  results: T[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface GenreListResponse {
+  genres: Genre[];
 }
 
 export interface MovieDetail {
@@ -36,11 +47,4 @@ export interface Cast {
 export interface Credits {
   id: number;
   cast: Cast[];
-}
-
-export interface PaginatedResponse<T> {
-  page: number;
-  results: T[];
-  total_pages: number;
-  total_results: number;
 }

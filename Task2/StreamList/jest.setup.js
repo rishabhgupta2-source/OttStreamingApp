@@ -9,3 +9,19 @@ jest.mock('@react-native-community/blur', () => {
     BlurView: (props) => React.createElement(View, props),
   };
 });
+
+jest.mock('react-native-vector-icons/MaterialIcons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  const Mock = (props) =>
+    React.createElement(Text, props, props.name ?? 'icon');
+  return Mock;
+});
+
+jest.mock('react-native-linear-gradient', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const LinearGradient = (props) =>
+    React.createElement(View, props, props.children);
+  return { default: LinearGradient };
+});

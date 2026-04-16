@@ -11,3 +11,11 @@ export function buildTmdbImageUrl(
   }
   return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
 }
+
+/** Alias for UI components — same behavior as {@link buildTmdbImageUrl}. */
+export function getImageUrl(
+  path: string | null,
+  size: TmdbImageSize,
+): string | null {
+  return buildTmdbImageUrl(path, size);
+}

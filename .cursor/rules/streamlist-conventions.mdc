@@ -9,7 +9,7 @@ alwaysApply: true
 2. All color values must come from `src/theme/colors.ts`. No hardcoded hex strings anywhere in component or screen files.
 3. All spacing values must come from `src/theme/spacing.ts`. No hardcoded pixel numbers in StyleSheet files.
 4. Every screen must fetch data exclusively through a custom hook. No inline `useEffect` + `fetch` or `useEffect` + `axios` inside screen components.
-5. Every custom data-fetching hook must return exactly this shape: `{ data, loading, error, refetch }`. No other shape is permitted.
+5. Every custom data-fetching hook for a **single** remote resource must expose `{ data, loading, error, refetch }`. TMDB paginated movie lists may additionally expose `loadMore` and `hasMore` (see `usePaginatedMovieList`). Composite hooks such as `useHome` compose those resources: each async slice (`genres`, `trending`, `topRated`, `genreMovies`) follows `AsyncResource` or `PaginatedMovieListResource`, and screen-specific UI state (for example `selectedGenreId`) may appear alongside those slices.
 6. No `any` types anywhere. TypeScript strict mode is enforced.
 7. No third-party UI component libraries. No React Native Paper, Elements, or similar.
 8. No CSS-in-JS. No NativeWind, Styled Components, or similar.

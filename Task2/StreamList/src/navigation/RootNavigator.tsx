@@ -2,7 +2,10 @@ import { BlurView } from '@react-native-community/blur';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet, Text, View } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DetailScreen } from '../screens/DetailScreen';
+import { HomeScreen } from '../screens/HomeScreen';
 import { useWatchlistStore } from '../store/watchlistStore';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
@@ -49,9 +52,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.surface,
   },
-  tabBarIconText: {
-    ...typography.title_lg,
-  },
 });
 
 function PlaceholderScreen({ title }: Readonly<{ title: string }>) {
@@ -90,14 +90,16 @@ function TabBarBackground() {
 function HomeStackNavigator() {
   return (
     <HomeStack.Navigator screenOptions={stackScreenOptions}>
-      <HomeStack.Screen name="HomeMain" options={{ title: 'Home' }}>
-        {() => <PlaceholderScreen title="HomeMain" />}
-      </HomeStack.Screen>
-      <HomeStack.Screen name="Detail" options={{ title: 'Detail' }}>
-        {(props) => (
-          <StackDetailScreen movieId={props.route.params.movieId} />
-        )}
-      </HomeStack.Screen>
+      <HomeStack.Screen
+        component={HomeScreen}
+        name="HomeMain"
+        options={{ title: 'Home' }}
+      />
+      <HomeStack.Screen
+        component={DetailScreen}
+        name="Detail"
+        options={{ title: 'Detail' }}
+      />
     </HomeStack.Navigator>
   );
 }
@@ -139,12 +141,30 @@ function ProfileTabScreen() {
   return <PlaceholderScreen title="Profile" />;
 }
 
-const TAB_ICONS: Record<keyof RootTabParamList, string> = {
-  Home: '⌂',
-  Search: '⌕',
-  Watchlist: '♥',
-  Profile: '☺',
-};
+type TabBarMaterialIconName =
+  | 'home'
+  | 'search'
+  | 'favorite'
+  | 'favorite-border'
+  | 'person';
+
+function tabBarIconForRoute(
+  routeName: keyof RootTabParamList,
+  focused: boolean,
+): TabBarMaterialIconName {
+  switch (routeName) {
+    case 'Home':
+      return 'home';
+    case 'Search':
+      return 'search';
+    case 'Watchlist':
+      return focused ? 'favorite' : 'favorite-border';
+    case 'Profile':
+      return 'person';
+    default:
+      return 'home';
+  }
+}
 
 export default function RootNavigator() {
   const insets = useSafeAreaInsets();
@@ -176,11 +196,16 @@ export default function RootNavigator() {
           overflow: 'hidden',
         },
         tabBarBackground: TabBarBackground,
-        tabBarIcon: ({ color }) => (
-          <Text style={[styles.tabBarIconText, { color }]}>
-            {TAB_ICONS[route.name]}
-          </Text>
-        ),
+        tabBarIcon: ({ color, size, focused }) => {
+          const routeName = route.name as keyof RootTabParamList;
+          return (
+            <MaterialIcons
+              name={tabBarIconForRoute(routeName, focused)}
+              size={size}
+              color={color}
+            />
+          );
+        },
       })}
     >
       <Tab.Screen
