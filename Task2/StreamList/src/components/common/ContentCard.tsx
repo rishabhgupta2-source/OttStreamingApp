@@ -22,12 +22,21 @@ export type ContentCardProps = {
   genreMap?: GenreNameMap;
   /** When false, omits trailing margin (e.g. horizontal FlatList with `gap`). Default true. */
   includeEndMargin?: boolean;
+  /** Extra space below card (e.g. 2-column search grids). Default false. */
+  includeBottomSpacing?: boolean;
 };
 
+function releaseYear(movie: Movie): string {
+  const raw = movie.release_date;
+  if (raw == null || raw.length === 0) {
+    return '';
+  }
+  return raw.split('-')[0] ?? '';
+}
+
 function formatSubtitle(movie: Movie, genreMap: GenreNameMap | undefined): string {
-  const year =
-    movie.release_date.length > 0 ? movie.release_date.split('-')[0] ?? '' : '';
-  const firstGenreId = movie.genre_ids[0];
+  const year = releaseYear(movie);
+  const firstGenreId = movie.genre_ids?.[0];
   const genreName =
     firstGenreId !== undefined && genreMap !== undefined
       ? genreMap[firstGenreId]
@@ -57,6 +66,7 @@ export function ContentCard({
   width,
   genreMap,
   includeEndMargin = true,
+  includeBottomSpacing = false,
 }: ContentCardProps) {
   const cardWidth = width ?? spacing.content_card_width;
   const posterHeight = useMemo(() => cardWidth * 1.5, [cardWidth]);
@@ -74,7 +84,11 @@ export function ContentCard({
       onPress={() => {
         onPress(movie.id);
       }}
-      style={[{ width: cardWidth }, includeEndMargin ? styles.cardEndMargin : null]}
+      style={[
+        { width: cardWidth },
+        includeEndMargin ? styles.cardEndMargin : null,
+        includeBottomSpacing ? styles.cardBottomSpacing : null,
+      ]}
     >
       <View style={[styles.posterFrame, { height: posterHeight }]}>
         {posterUri !== null ? (
@@ -106,7 +120,7 @@ export function ContentCard({
               style={styles.ratingStar}
             />
             <Text style={[typography.label_sm, styles.ratingText]}>
-              {movie.vote_average.toFixed(1)}
+              {Number(movie.vote_average).toFixed(1)}
             </Text>
           </View>
         ) : null}
@@ -126,6 +140,9 @@ export function ContentCard({
 const styles = StyleSheet.create({
   cardEndMargin: {
     marginRight: spacing.md,
+  },
+  cardBottomSpacing: {
+    marginBottom: spacing.lg,
   },
   posterFrame: {
     width: '100%',

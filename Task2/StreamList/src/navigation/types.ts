@@ -16,11 +16,15 @@ export type WatchlistStackParamList = {
   Detail: { movieId: number };
 };
 
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+};
+
 export type RootTabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList>;
   Search: NavigatorScreenParams<SearchStackParamList>;
   Watchlist: NavigatorScreenParams<WatchlistStackParamList>;
-  Profile: undefined;
+  Profile: NavigatorScreenParams<ProfileStackParamList>;
 };
 
 export type HomeStackNavigationProp<

@@ -6,12 +6,15 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DetailScreen } from '../screens/DetailScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { SearchScreen } from '../screens/SearchScreen';
 import { useWatchlistStore } from '../store/watchlistStore';
 import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { spacing, scrollPaddingBelowFloatingTabBar } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import { getFloatingTabBarStyle } from './tabBarFloatingStyle';
 import type {
   HomeStackParamList,
+  ProfileStackParamList,
   RootTabParamList,
   SearchStackParamList,
   WatchlistStackParamList,
@@ -22,9 +25,7 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
 const WatchlistStack =
   createNativeStackNavigator<WatchlistStackParamList>();
-
-const TAB_BAR_BASE_HEIGHT =
-  spacing.massive + spacing.xl + spacing.sm;
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
 const stackScreenOptions = {
   headerShown: false as const,
@@ -37,7 +38,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.surface,
-    paddingBottom: TAB_BAR_BASE_HEIGHT + spacing.xxl,
   },
   placeholderText: {
     color: colors.on_surface,
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   tabBarBlurRoot: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
-    borderRadius: spacing.lg,
+    borderRadius: spacing.xl,
   },
   tabBarTint: {
     ...StyleSheet.absoluteFillObject,
@@ -55,20 +55,17 @@ const styles = StyleSheet.create({
 });
 
 function PlaceholderScreen({ title }: Readonly<{ title: string }>) {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.placeholder}>
+    <View
+      style={[
+        styles.placeholder,
+        {
+          paddingBottom: scrollPaddingBelowFloatingTabBar(insets.bottom),
+        },
+      ]}
+    >
       <Text style={styles.placeholderText}>{title}</Text>
-    </View>
-  );
-}
-
-function StackDetailScreen({
-  movieId,
-}: Readonly<{ movieId: number }>) {
-  return (
-    <View style={styles.placeholder}>
-      <Text style={styles.placeholderText}>Detail</Text>
-      <Text style={styles.placeholderText}>{String(movieId)}</Text>
     </View>
   );
 }
@@ -107,14 +104,16 @@ function HomeStackNavigator() {
 function SearchStackNavigator() {
   return (
     <SearchStack.Navigator screenOptions={stackScreenOptions}>
-      <SearchStack.Screen name="SearchMain" options={{ title: 'Search' }}>
-        {() => <PlaceholderScreen title="SearchMain" />}
-      </SearchStack.Screen>
-      <SearchStack.Screen name="Detail" options={{ title: 'Detail' }}>
-        {(props) => (
-          <StackDetailScreen movieId={props.route.params.movieId} />
-        )}
-      </SearchStack.Screen>
+      <SearchStack.Screen
+        component={SearchScreen}
+        name="SearchMain"
+        options={{ title: 'Search' }}
+      />
+      <SearchStack.Screen
+        component={DetailScreen}
+        name="Detail"
+        options={{ title: 'Detail' }}
+      />
     </SearchStack.Navigator>
   );
 }
@@ -128,17 +127,29 @@ function WatchlistStackNavigator() {
       >
         {() => <PlaceholderScreen title="WatchlistMain" />}
       </WatchlistStack.Screen>
-      <WatchlistStack.Screen name="Detail" options={{ title: 'Detail' }}>
-        {(props) => (
-          <StackDetailScreen movieId={props.route.params.movieId} />
-        )}
-      </WatchlistStack.Screen>
+      <WatchlistStack.Screen
+        component={DetailScreen}
+        name="Detail"
+        options={{ title: 'Detail' }}
+      />
     </WatchlistStack.Navigator>
   );
 }
 
 function ProfileTabScreen() {
   return <PlaceholderScreen title="Profile" />;
+}
+
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator screenOptions={stackScreenOptions}>
+      <ProfileStack.Screen
+        component={ProfileTabScreen}
+        name="ProfileMain"
+        options={{ title: 'Profile' }}
+      />
+    </ProfileStack.Navigator>
+  );
 }
 
 type TabBarMaterialIconName =
@@ -171,37 +182,34 @@ export default function RootNavigator() {
   const watchlistCount = useWatchlistStore((s) => s.count);
   const watchlistHydrated = useWatchlistStore((s) => s.hydrated);
 
-  const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
-
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarShowLabel: false,
-        tabBarLabel: () => null,
+        tabBarShowLabel: true,
         tabBarActiveTintColor: colors.primary_container,
         tabBarInactiveTintColor: colors.on_surface_variant,
-        tabBarStyle: {
-          position: 'absolute',
-          left: spacing.sm,
-          right: spacing.sm,
-          bottom: spacing.sm,
-          height: tabBarHeight,
-          paddingTop: spacing.sm,
-          paddingBottom: insets.bottom,
-          borderTopWidth: 0,
-          elevation: 0,
-          backgroundColor: 'transparent',
-          borderRadius: spacing.lg,
-          overflow: 'hidden',
+        tabBarLabelStyle: {
+          ...typography.label_sm,
+          textTransform: 'uppercase',
+          marginTop: spacing.sm,
         },
+        tabBarItemStyle: {
+          paddingTop: spacing.xs,
+          flex: 1,
+        },
+        tabBarIconStyle: {
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        tabBarStyle: getFloatingTabBarStyle(insets.bottom),
         tabBarBackground: TabBarBackground,
-        tabBarIcon: ({ color, size, focused }) => {
+        tabBarIcon: ({ color, focused }) => {
           const routeName = route.name as keyof RootTabParamList;
           return (
             <MaterialIcons
               name={tabBarIconForRoute(routeName, focused)}
-              size={size}
+              size={spacing.xxxl}
               color={color}
             />
           );
@@ -211,31 +219,43 @@ export default function RootNavigator() {
       <Tab.Screen
         name="Home"
         component={HomeStackNavigator}
-        options={{ title: 'Home' }}
+        options={{ title: 'Home', tabBarLabel: 'Home' }}
       />
       <Tab.Screen
         name="Search"
         component={SearchStackNavigator}
-        options={{ title: 'Search' }}
+        options={{ title: 'Search', tabBarLabel: 'Search' }}
       />
       <Tab.Screen
         name="Watchlist"
         component={WatchlistStackNavigator}
         options={{
           title: 'Watchlist',
+          tabBarLabel: 'Watchlist',
           tabBarBadge:
             watchlistHydrated && watchlistCount > 0
-              ? watchlistCount
+              ? watchlistCount > 99
+                ? '99+'
+                : watchlistCount
               : undefined,
           tabBarBadgeStyle: {
             backgroundColor: colors.primary_container,
+            color: colors.surface,
+            fontSize: typography.label_sm.fontSize,
+            fontWeight: '600',
+            minWidth: spacing.xxl,
+            height: spacing.xxl,
+            lineHeight: spacing.xxl,
+            paddingHorizontal: spacing.xs,
+            borderRadius: spacing.md,
+            textAlign: 'center',
           },
         }}
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileTabScreen}
-        options={{ title: 'Profile' }}
+        component={ProfileStackNavigator}
+        options={{ title: 'Profile', tabBarLabel: 'Profile' }}
       />
     </Tab.Navigator>
   );

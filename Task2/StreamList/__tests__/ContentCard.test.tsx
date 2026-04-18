@@ -42,3 +42,16 @@ test('ContentCard hides rating when vote is zero', () => {
     tree.unmount();
   });
 });
+
+test('ContentCard handles null release_date (TMDB search rows)', () => {
+  ReactTestRenderer.act(() => {
+    const tree = ReactTestRenderer.create(
+      <ContentCard
+        genreMap={{ 28: 'Action' }}
+        movie={{ ...baseMovie, release_date: null }}
+        onPress={() => {}}
+      />,
+    );
+    tree.unmount();
+  });
+});

@@ -5,6 +5,19 @@ import { getErrorMessage } from '../utils/getErrorMessage';
 
 type FetchPage = (page: number) => Promise<PaginatedResponse<Movie>>;
 
+/** TMDB pages can overlap; keep first occurrence so FlatList keys stay unique. */
+function dedupeMoviesById(movies: Movie[]): Movie[] {
+  const seen = new Set<number>();
+  const out: Movie[] = [];
+  for (const movie of movies) {
+    if (!seen.has(movie.id)) {
+      seen.add(movie.id);
+      out.push(movie);
+    }
+  }
+  return out;
+}
+
 function normalizePageSlice(
   res: PaginatedResponse<Movie>,
 ): { results: Movie[]; page: number; total_pages: number } {
@@ -60,7 +73,7 @@ export function usePaginatedMovieList(
           return;
         }
         const slice = normalizePageSlice(res);
-        setData(slice.results);
+        setData(dedupeMoviesById(slice.results));
         setTotalPages(slice.total_pages);
         setPage(slice.page);
       })
@@ -96,7 +109,7 @@ export function usePaginatedMovieList(
           return;
         }
         const slice = normalizePageSlice(res);
-        setData((prev) => [...prev, ...slice.results]);
+        setData((prev) => dedupeMoviesById([...prev, ...slice.results]));
         setTotalPages(slice.total_pages);
         setPage(slice.page);
       })

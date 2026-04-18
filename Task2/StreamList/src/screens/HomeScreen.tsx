@@ -1,18 +1,24 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ScrollView, StyleSheet } from 'react-native';
+import { useCallback, useState } from 'react';
+import {
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ContentRow } from '../components/home/ContentRow';
 import { GenreFilterStrip } from '../components/home/GenreFilterStrip';
 import { HeroCard } from '../components/home/HeroCard';
+import { HomeGenreDiscoverSection } from '../components/home/HomeGenreDiscoverSection';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { LoadingMoreIndicator } from '../components/home/LoadingMoreIndicator';
 import { useHome } from '../hooks/useHome';
 import type { HomeStackParamList } from '../navigation/types';
 import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import { scrollPaddingBelowFloatingTabBar, spacing } from '../theme/spacing';
 
-const TAB_BAR_BASE_HEIGHT =
-  spacing.massive + spacing.xl + spacing.sm;
+const GENRE_VERTICAL_LOAD_THRESHOLD = spacing.xxl * 8;
 
 export type HomeScreenProps = NativeStackScreenProps<
   HomeStackParamList,
@@ -25,10 +31,14 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
     genres,
     trending,
     topRated,
-    genreMovies,
+    genreDiscoverSections,
+    hasMoreGenres,
+    loadMoreGenres,
     selectedGenreId,
     setSelectedGenre,
   } = useHome();
+
+  const [nearVerticalEnd, setNearVerticalEnd] = useState(false);
 
   const genreMap = genres.data.reduce<Record<number, string>>(
     (map, g) => ({ ...map, [g.id]: g.name }),
@@ -40,21 +50,31 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
       ? null
       : (trending.data[0] ?? null);
 
-  const genreRowTitle =
-    selectedGenreId === null
-      ? 'Popular'
-      : (genres.data.find((g) => g.id === selectedGenreId)?.name ?? 'Popular');
-
-  const showLoadingMoreFooter =
+  const showHorizontalLoadMoreFooter =
     (trending.hasMore &&
       trending.loading &&
       trending.data.length > 0) ||
     (topRated.hasMore &&
       topRated.loading &&
-      topRated.data.length > 0) ||
-    (genreMovies.hasMore &&
-      genreMovies.loading &&
-      genreMovies.data.length > 0);
+      topRated.data.length > 0);
+
+  const showVerticalGenreLoadMoreFooter =
+    selectedGenreId === null && hasMoreGenres && nearVerticalEnd;
+
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { layoutMeasurement, contentOffset, contentSize } =
+        event.nativeEvent;
+      const nearBottom =
+        layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - GENRE_VERTICAL_LOAD_THRESHOLD;
+      setNearVerticalEnd(nearBottom);
+      if (nearBottom && hasMoreGenres) {
+        loadMoreGenres();
+      }
+    },
+    [hasMoreGenres, loadMoreGenres],
+  );
 
   const navigateToDetail = (movieId: number) => {
     navigation.navigate('Detail', { movieId });
@@ -65,10 +85,11 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
       contentContainerStyle={[
         styles.scrollContent,
         {
-          paddingBottom:
-            insets.bottom + TAB_BAR_BASE_HEIGHT + spacing.xxl,
+          paddingBottom: scrollPaddingBelowFloatingTabBar(insets.bottom),
         },
       ]}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
       style={styles.scroll}
     >
@@ -101,16 +122,20 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         onCardPress={navigateToDetail}
         title="Top Rated"
       />
-      <ContentRow
-        data={genreMovies.data}
-        genreMap={genreMap}
-        hasMore={genreMovies.hasMore}
-        loadMore={genreMovies.loadMore}
-        loading={genreMovies.loading}
-        onCardPress={navigateToDetail}
-        title={genreRowTitle}
+      {genreDiscoverSections.map((section) => (
+        <HomeGenreDiscoverSection
+          genreId={section.genreId}
+          genreMap={genreMap}
+          key={section.genreId}
+          onCardPress={navigateToDetail}
+          title={section.title}
+        />
+      ))}
+      <LoadingMoreIndicator
+        visible={
+          showHorizontalLoadMoreFooter || showVerticalGenreLoadMoreFooter
+        }
       />
-      <LoadingMoreIndicator visible={showLoadingMoreFooter} />
     </ScrollView>
   );
 }

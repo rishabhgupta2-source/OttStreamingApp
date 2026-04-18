@@ -64,6 +64,7 @@ const client = axios.create({
 });
 
 client.interceptors.request.use((config) => {
+  config.headers.Accept = 'application/json';
   const token = readBearerToken();
   if (token.length > 0) {
     config.headers.Authorization = `Bearer ${token}`;

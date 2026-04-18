@@ -48,9 +48,11 @@ export const useWatchlistStore = create<WatchlistStore>()(
       name: 'watchlist-storage',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ items: state.items }),
-      onRehydrateStorage: () => () => {
-        useWatchlistStore.setState({ hydrated: true });
-      },
+      onRehydrateStorage:
+        (_initialState) =>
+        (_rehydratedState, _error) => {
+          useWatchlistStore.setState({ hydrated: true });
+        },
     },
   ),
 );
