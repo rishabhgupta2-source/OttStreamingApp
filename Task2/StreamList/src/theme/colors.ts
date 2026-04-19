@@ -27,6 +27,8 @@ export const colors = {
   detail_nav_action_scrim:   'rgba(19, 19, 19, 0.58)',
   /** Back / share icons on detail scrim — full white for contrast on photos. */
   detail_nav_on_scrim:       '#FFFFFF',
+  /** Star + numerals on dark rating pills (posters, list cards). */
+  rating_pill_on_overlay:    '#FFFFFF',
 
   /** “In Watchlist” CTA: border, icon, label — light coral (lighter than primary_container). */
   watchlist_in_list_accent:  '#FFB3AE',

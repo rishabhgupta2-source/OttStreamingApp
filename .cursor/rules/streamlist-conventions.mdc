@@ -30,3 +30,23 @@ alwaysApply: true
 23. Never cancel a previous API call by ignoring the response silently. Use a ref-based isMounted check or track the current genreId to prevent stale state updates.
 24. All navigation.navigate() calls must use fully typed params from src/navigation/types.ts. Never pass untyped route params.
 25. DetailScreen must never show the bottom tab bar. It is a stack screen pushed over the tabs.
+
+## Watchlist Screen Rules
+
+26. WatchlistTopBar (StreamList logo + search + avatar) must appear on BOTH populated and empty states of WatchlistScreen. It is always the first element rendered in WatchlistScreen.
+
+27. WatchlistGrid reads data from Zustand store ONLY. No API calls inside WatchlistGrid or WatchlistScreen. Only BecauseSavedRow is allowed to call getSimilarMovies.
+
+28. Filter chips (All/Movies/Series) on WatchlistScreen do client-side filtering ONLY. Never re-fetch from API when filter changes. `mediaType === 'movie'` for Movies filter, `mediaType === 'tv'` for Series filter.
+
+29. WatchlistCard removal must be OPTIMISTIC. Call `removeItem(id)` from Zustand immediately. Never wait for AsyncStorage confirm.
+
+30. BecauseSavedRow link text must be "View All" not "See All".
+
+31. BecauseSavedRow must return null when similar movies array is empty. Never show section header with nothing below it.
+
+32. WatchlistEmptyState "Browse Trending Now" button must use `navigation.navigate('Home')` for tab switch, never push.
+
+33. GenreChip from `src/components/common/GenreChip.tsx` must be reused for All/Movies/Series filter chips on WatchlistScreen. Never create a new chip component for this screen.
+
+34. Never render any WatchlistScreen content before `hydrated === true` from Zustand watchlistStore.

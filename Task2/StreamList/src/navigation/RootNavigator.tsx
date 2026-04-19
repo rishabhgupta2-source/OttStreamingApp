@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DetailScreen } from '../screens/DetailScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { SearchScreen } from '../screens/SearchScreen';
+import { WatchlistScreen } from '../screens/WatchlistScreen';
 import { useWatchlistStore } from '../store/watchlistStore';
 import { colors } from '../theme/colors';
 import { spacing, scrollPaddingBelowFloatingTabBar } from '../theme/spacing';
@@ -122,11 +123,10 @@ function WatchlistStackNavigator() {
   return (
     <WatchlistStack.Navigator screenOptions={stackScreenOptions}>
       <WatchlistStack.Screen
+        component={WatchlistScreen}
         name="WatchlistMain"
         options={{ title: 'Watchlist' }}
-      >
-        {() => <PlaceholderScreen title="WatchlistMain" />}
-      </WatchlistStack.Screen>
+      />
       <WatchlistStack.Screen
         component={DetailScreen}
         name="Detail"
@@ -155,8 +155,8 @@ function ProfileStackNavigator() {
 type TabBarMaterialIconName =
   | 'home'
   | 'search'
-  | 'favorite'
-  | 'favorite-border'
+  | 'bookmark'
+  | 'bookmark-border'
   | 'person';
 
 function tabBarIconForRoute(
@@ -169,7 +169,7 @@ function tabBarIconForRoute(
     case 'Search':
       return 'search';
     case 'Watchlist':
-      return focused ? 'favorite' : 'favorite-border';
+      return focused ? 'bookmark' : 'bookmark-border';
     case 'Profile':
       return 'person';
     default:
@@ -179,8 +179,8 @@ function tabBarIconForRoute(
 
 export default function RootNavigator() {
   const insets = useSafeAreaInsets();
-  const watchlistCount = useWatchlistStore((s) => s.count);
-  const watchlistHydrated = useWatchlistStore((s) => s.hydrated);
+  /** `items.length` (not store getter) so tab badge re-renders reliably on add/remove. */
+  const watchlistCount = useWatchlistStore((state) => state.items.length);
 
   return (
     <Tab.Navigator
@@ -233,22 +233,10 @@ export default function RootNavigator() {
           title: 'Watchlist',
           tabBarLabel: 'Watchlist',
           tabBarBadge:
-            watchlistHydrated && watchlistCount > 0
-              ? watchlistCount > 99
-                ? '99+'
-                : watchlistCount
-              : undefined,
+            watchlistCount > 0 ? watchlistCount : undefined,
           tabBarBadgeStyle: {
             backgroundColor: colors.primary_container,
             color: colors.surface,
-            fontSize: typography.label_sm.fontSize,
-            fontWeight: '600',
-            minWidth: spacing.xxl,
-            height: spacing.xxl,
-            lineHeight: spacing.xxl,
-            paddingHorizontal: spacing.xs,
-            borderRadius: spacing.md,
-            textAlign: 'center',
           },
         }}
       />

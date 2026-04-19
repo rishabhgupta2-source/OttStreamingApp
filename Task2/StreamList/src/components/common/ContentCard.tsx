@@ -116,7 +116,7 @@ export function ContentCard({
               importantForAccessibility="no-hide-descendants"
               name="star"
               size={typography.label_sm.fontSize}
-              color={colors.primary_container}
+              color={colors.rating_pill_on_overlay}
               style={styles.ratingStar}
             />
             <Text style={[typography.label_sm, styles.ratingText]}>
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
   },
   ratingText: {
-    color: colors.on_surface,
+    color: colors.rating_pill_on_overlay,
   },
   title: {
     marginTop: spacing.sm,

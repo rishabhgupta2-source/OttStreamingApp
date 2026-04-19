@@ -27,6 +27,14 @@ export const spacing = {
   cast_avatar_radius: 30,
   /** Cast row cell width (avatar + labels) */
   cast_row_item_width: 80,
+  /** Watchlist segmented filter outer bar (rounded rectangle, ~8px) */
+  watchlist_filter_strip_radius: 8,
+  /** Watchlist segmented filter selected segment radius */
+  watchlist_filter_chip_radius: 8,
+  /** Watchlist empty state bookmark icon (Ionicons / layout box) */
+  watchlist_empty_bookmark_icon_size: 80,
+  /** Watchlist top bar avatar emoji size */
+  watchlist_top_bar_avatar_emoji_size: 18,
   /** Tight vertical gap (e.g. skeleton subtitle offset) */
   xxs: 6,
   xs:  4,

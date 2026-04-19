@@ -18,6 +18,14 @@ jest.mock('react-native-vector-icons/MaterialIcons', () => {
   return Mock;
 });
 
+jest.mock('react-native-vector-icons/Ionicons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  const Mock = (props) =>
+    React.createElement(Text, props, props.name ?? 'ionicon');
+  return Mock;
+});
+
 jest.mock('react-native-linear-gradient', () => {
   const React = require('react');
   const { View } = require('react-native');
