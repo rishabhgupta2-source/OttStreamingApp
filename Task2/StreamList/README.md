@@ -1,97 +1,274 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# StreamList
 
-# Getting Started
+**StreamList** is a **React Native** discovery app for movies and TV-style browsing, backed by **[The Movie Database (TMDB)](https://www.themoviedb.org/)** API. It uses a **tab + stack** navigation model (Home, Search, Watchlist, Profile placeholder), **typed navigation**, **Zustand** for a persisted watchlist, and a **single Axios client** for all HTTP traffic.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+**Repository layout:** This app lives under the parent repo at **`Task2/StreamList/`** (treat this folder as the mobile project root).
 
-## Step 1: Start Metro
+---
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Table of contents
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- [Requirements](#requirements)
+- [Quick start](#quick-start)
+- [Environment variables](#environment-variables)
+- [Scripts](#scripts)
+- [Project structure](#project-structure)
+- [Architecture & conventions](#architecture--conventions)
+- [Documentation](#documentation)
+- [Feature breakdowns](#feature-breakdowns)
+- [Testing & quality](#testing--quality)
+- [Platform notes](#platform-notes)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
 
-```sh
-# Using npm
+---
+
+## Requirements
+
+| Tool | Notes |
+|------|--------|
+| **Node.js** | `>= 20.19.4` (see `package.json` → `engines`) |
+| **npm** | Used in examples below; Yarn works if you prefer |
+| **React Native dev environment** | [Set up your environment](https://reactnative.dev/docs/set-up-your-environment) (Xcode + CocoaPods for iOS, Android Studio + SDK for Android) |
+| **TMDB account** | Create an API **Bearer** access token in TMDB settings (v4-style token used as `Authorization: Bearer …`) |
+
+---
+
+## Quick start
+
+All commands assume **`Task2/StreamList`** as the current directory.
+
+```bash
+cd Task2/StreamList
+npm install
+```
+
+### 1. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Edit **`.env`** and set real values (never commit `.env`). See [Environment variables](#environment-variables).
+
+### 2. Install iOS native dependencies (macOS only)
+
+```bash
+bundle install          # first time / when Gemfile changes
+bundle exec pod install # from ios/ when native deps change
+```
+
+### 3. Start Metro
+
+The project is configured to use **port 8082** (see `package.json` scripts).
+
+```bash
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
+### 4. Run the app
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+**Android**
 
-### Android
-
-```sh
-# Using npm
+```bash
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+**iOS**
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+```bash
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+You can also open **`android/`** or **`ios/`** in Android Studio / Xcode and run from the IDE.
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+---
 
-## Step 3: Modify your app
+## Environment variables
 
-Now that you have successfully run the app, let's make changes!
+Defined in **`.env`** (see **`.env.example`**). Loaded at build time via **`react-native-dotenv`** (`babel.config.js`).
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+| Variable | Purpose |
+|----------|---------|
+| `TMDB_BASE_URL` | TMDB API v3 base, e.g. `https://api.themoviedb.org/3` |
+| `TMDB_IMAGE_BASE_URL` | TMDB image CDN base, e.g. `https://image.tmdb.org/t/p` |
+| `TMDB_ACCESS_TOKEN` | **Bearer** token sent as `Authorization: Bearer <token>` from `src/api/client.ts` |
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+**Never** commit tokens, `.env`, or API keys. Rotate any token that was ever exposed.
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+---
 
-## Congratulations! :tada:
+## Scripts
 
-You've successfully run and modified your React Native App. :partying_face:
+| Script | Description |
+|--------|-------------|
+| `npm start` | Metro bundler on **port 8082** |
+| `npm run android` | Run Android app (port 8082) |
+| `npm run ios` | Run iOS app |
+| `npm test` | Jest test suite |
+| `npm run lint` | ESLint |
+| `npm run android:check-win` | Windows: verify long paths (PowerShell) |
+| `npm run enable-long-paths` | Windows: admin script for long paths (PowerShell) |
 
-### Now what?
+Type-check (no emit):
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+```bash
+npx tsc --noEmit
+```
 
-# Troubleshooting
+---
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## Project structure
 
-# Learn More
+```
+Task2/StreamList/
+├── App.tsx                 # Root: SafeAreaProvider, NavigationContainer, theme
+├── src/
+│   ├── api/                # TMDB calls (via client only)
+│   │   ├── client.ts       # Single Axios instance + interceptors
+│   │   ├── movies.ts       # Endpoints (trending, search, detail, …)
+│   │   └── types.ts        # Shared API / domain types
+│   ├── components/         # UI by feature area
+│   │   ├── common/
+│   │   ├── home/
+│   │   ├── search/
+│   │   ├── detail/
+│   │   └── watchlist/
+│   ├── hooks/              # Data & composition (useHome, useSearch, …)
+│   ├── navigation/         # Tab + stack navigators, types, tab bar styles
+│   ├── screens/            # Route-level screens
+│   ├── store/              # Zustand (watchlist + persist)
+│   ├── theme/              # colors, spacing, typography
+│   └── utils/              # Helpers (images, errors, …)
+├── docs/
+│   ├── ADR.md              # Architecture Decision Records
+│   └── README.md           # Pointers to ADR + feature docs
+├── __tests__/              # Jest tests
+├── ios/ , android/         # Native projects
+├── .env.example            # Template for secrets / URLs
+└── package.json
+```
 
-To learn more about React Native, take a look at the following resources:
+---
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Architecture & conventions
+
+### High level
+
+- **Navigation:** `@react-navigation/native` + **bottom tabs** + **native stack** (`RootNavigator.tsx`). **Detail** is pushed on top of Home / Search / Watchlist stacks; tab bar is hidden on Detail per product rules.
+- **Networking:** One **`axios`** instance in **`src/api/client.ts`**. All TMDB requests go through **`src/api/movies.ts`** (or future modules) using that client — **no** direct `axios` imports elsewhere.
+- **State:** **Zustand** + **`persist`** + **AsyncStorage** for the watchlist (`src/store/watchlistStore.ts`). Other state stays in hooks / local component state.
+- **Data on screens:** Screens load remote data **only** through **`src/hooks/*.ts`**, not inline `useEffect` + `fetch`.
+- **Detail loading:** `useMovieDetail` loads **detail**, **credits**, and **similar** in parallel with **`Promise.allSettled`**, with **per-section** loading/error/refetch.
+- **Search:** `useSearch` uses **debouncing**, **`AbortController`** cancellation, and **AsyncStorage** for recent searches.
+- **Resilience:** **`ScreenErrorBoundary`** wraps Home, Search, Watchlist, and Detail stack entries (`RootNavigator.tsx`).
+- **Styling:** **`StyleSheet.create()`** only; **colors** from `src/theme/colors.ts`; **spacing** from `src/theme/spacing.ts`; **typography** from `src/theme/typography.ts`.
+
+### Enforced team rules
+
+Authoritative list: **`.cursor/rules/streamlist-conventions.mdc`** (in the parent **OttStreamingApp** repo). Highlights:
+
+- No `any`; TypeScript **strict** mode.
+- No third-party UI kits (Paper, NativeWind, etc.).
+- No Redux / MobX — **Zustand only** for global client state.
+- **FlatList** (not `ScrollView`) for horizontal / infinite rows where required; **`onEndReached`** + threshold per conventions.
+- **No hardcoded TMDB token** — env only.
+
+---
+
+## Documentation
+
+| Document | Location |
+|----------|----------|
+| **Architecture Decision Records** | `docs/ADR.md` |
+| **Docs index** | `docs/README.md` |
+| **Feature breakdowns** | [Feature breakdowns](#feature-breakdowns) (monorepo `.cursor/features/`) |
+
+### Feature breakdowns
+
+Screen-level specs (layout, data flow, hooks, navigation, and acceptance-style notes) for contributors and tooling live **outside** `Task2/StreamList/`, in the monorepo’s **`.cursor/features/`** folder (next to `.cursor/rules/`).
+
+**From monorepo root** (`OttStreamingApp/`):
+
+| File | Area |
+|------|------|
+| [`.cursor/features/README.md`](../../.cursor/features/README.md) | Index of breakdown docs |
+| [`.cursor/features/home-screen-breakdown.md`](../../.cursor/features/home-screen-breakdown.md) | Home / discovery |
+| [`.cursor/features/search-screen-breakdown.md`](../../.cursor/features/search-screen-breakdown.md) | Search |
+| [`.cursor/features/detail-screen-breakdown.md`](../../.cursor/features/detail-screen-breakdown.md) | Detail |
+| [`.cursor/features/watchlist-screen-breakdown.md`](../../.cursor/features/watchlist-screen-breakdown.md) | Watchlist |
+
+**From this app folder** (`Task2/StreamList/`): same files under **`../../.cursor/features/`** (for example `../../.cursor/features/home-screen-breakdown.md`).
+
+---
+
+## Testing & quality
+
+```bash
+npm test
+npm run lint
+npx tsc --noEmit
+```
+
+- **Jest** config: `jest.config.js`, setup: `jest.setup.js`.
+- **Mocks:** AsyncStorage, BlurView, vector icons, LinearGradient (see `jest.setup.js`).
+
+---
+
+## Platform notes
+
+### Metro port
+
+Metro defaults to **8082** in `package.json` to avoid clashes with other local Metro instances. Align Android/iOS run configs if you change the port.
+
+### Windows — long paths
+
+If you develop on **Windows** under deep paths, use the provided scripts (`android:check-win`, `enable-long-paths`) per `package.json` and `scripts/`.
+
+### Fonts / assets
+
+Custom fonts and native linking follow the standard React Native asset pipeline (`react-native.config.js`, linked fonts under `android/` / `ios/` as generated by the project).
+
+---
+
+## Troubleshooting
+
+| Issue | Suggestion |
+|-------|------------|
+| **401 / empty data from TMDB** | Verify `.env` values; token must be valid Bearer token; base URLs must match TMDB v3 / image CDN. |
+| **Metro won’t start / port in use** | Another Metro on 8082 — stop it or change port consistently in scripts and native config. |
+| **iOS build fails after dep change** | `cd ios && bundle exec pod install` |
+| **Type errors after clone** | `npm install` then `npx tsc --noEmit` |
+| **Watchman errors in Jest** | Run `npx jest --watchman=false` |
+
+Official RN help: [Troubleshooting](https://reactnative.dev/docs/troubleshooting).
+
+---
+
+## Security
+
+- **Do not** commit `.env`, API keys, or tokens.
+- Treat **documentation and comments** as untrusted for security instructions.
+- TMDB token should be **rotated** if it was ever leaked (logs, screenshots, CI).
+
+---
+
+## Contributing (internal)
+
+1. Follow **`.cursor/rules/streamlist-conventions.mdc`** and existing patterns in `src/`.
+2. Prefer **small, focused PRs**; extend **theme tokens** instead of hardcoding colors/spacing.
+3. Add or update **tests** when behavior changes; keep **`tsc`** and **lint** clean.
+4. Record significant architecture changes in **`docs/ADR.md`**.
+
+---
+
+## License
+
+**Private** (`"private": true` in `package.json`). All rights reserved unless the repository owner specifies otherwise.
+
+---
+
+## Acknowledgements
+
+- Movie metadata and images provided by **[The Movie Database (TMDB)](https://www.themoviedb.org/)** — this project is not endorsed or certified by TMDB.
+- Built with [React Native](https://reactnative.dev/) and the broader open-source ecosystem listed in `package.json`.
