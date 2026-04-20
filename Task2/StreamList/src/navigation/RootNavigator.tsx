@@ -1,10 +1,16 @@
 import { BlurView } from '@react-native-community/blur';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { StyleSheet, Text, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DetailScreen } from '../screens/DetailScreen';
+import { useShallow } from 'zustand/react/shallow';
+import { ScreenErrorBoundary } from '../components/common/ScreenErrorBoundary';
+import {
+  DetailScreen,
+  type DetailScreenProps,
+} from '../screens/DetailScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { SearchScreen } from '../screens/SearchScreen';
 import { WatchlistScreen } from '../screens/WatchlistScreen';
@@ -85,16 +91,34 @@ function TabBarBackground() {
   );
 }
 
+function HomeScreenWithErrorBoundary(
+  props: Readonly<NativeStackScreenProps<HomeStackParamList, 'HomeMain'>>,
+) {
+  return (
+    <ScreenErrorBoundary>
+      <HomeScreen {...props} />
+    </ScreenErrorBoundary>
+  );
+}
+
+function DetailScreenWithErrorBoundary(props: Readonly<DetailScreenProps>) {
+  return (
+    <ScreenErrorBoundary>
+      <DetailScreen {...props} />
+    </ScreenErrorBoundary>
+  );
+}
+
 function HomeStackNavigator() {
   return (
     <HomeStack.Navigator screenOptions={stackScreenOptions}>
       <HomeStack.Screen
-        component={HomeScreen}
+        component={HomeScreenWithErrorBoundary}
         name="HomeMain"
         options={{ title: 'Home' }}
       />
       <HomeStack.Screen
-        component={DetailScreen}
+        component={DetailScreenWithErrorBoundary}
         name="Detail"
         options={{ title: 'Detail' }}
       />
@@ -102,16 +126,26 @@ function HomeStackNavigator() {
   );
 }
 
+function SearchScreenWithErrorBoundary(
+  props: Readonly<NativeStackScreenProps<SearchStackParamList, 'SearchMain'>>,
+) {
+  return (
+    <ScreenErrorBoundary>
+      <SearchScreen {...props} />
+    </ScreenErrorBoundary>
+  );
+}
+
 function SearchStackNavigator() {
   return (
     <SearchStack.Navigator screenOptions={stackScreenOptions}>
       <SearchStack.Screen
-        component={SearchScreen}
+        component={SearchScreenWithErrorBoundary}
         name="SearchMain"
         options={{ title: 'Search' }}
       />
       <SearchStack.Screen
-        component={DetailScreen}
+        component={DetailScreenWithErrorBoundary}
         name="Detail"
         options={{ title: 'Detail' }}
       />
@@ -119,16 +153,28 @@ function SearchStackNavigator() {
   );
 }
 
+function WatchlistScreenWithErrorBoundary(
+  props: Readonly<
+    NativeStackScreenProps<WatchlistStackParamList, 'WatchlistMain'>
+  >,
+) {
+  return (
+    <ScreenErrorBoundary>
+      <WatchlistScreen {...props} />
+    </ScreenErrorBoundary>
+  );
+}
+
 function WatchlistStackNavigator() {
   return (
     <WatchlistStack.Navigator screenOptions={stackScreenOptions}>
       <WatchlistStack.Screen
-        component={WatchlistScreen}
+        component={WatchlistScreenWithErrorBoundary}
         name="WatchlistMain"
         options={{ title: 'Watchlist' }}
       />
       <WatchlistStack.Screen
-        component={DetailScreen}
+        component={DetailScreenWithErrorBoundary}
         name="Detail"
         options={{ title: 'Detail' }}
       />
@@ -179,8 +225,15 @@ function tabBarIconForRoute(
 
 export default function RootNavigator() {
   const insets = useSafeAreaInsets();
-  /** `items.length` (not store getter) so tab badge re-renders reliably on add/remove. */
-  const watchlistCount = useWatchlistStore((state) => state.items.length);
+  /** Badge only after rehydrate; `items.length` updates immediately on add/remove. */
+  const { watchlistCount, watchlistHydrated } = useWatchlistStore(
+    useShallow((state) => ({
+      watchlistCount: state.items.length,
+      watchlistHydrated: state.hydrated,
+    })),
+  );
+  const watchlistBadgeValue =
+    watchlistHydrated && watchlistCount > 0 ? watchlistCount : undefined;
 
   return (
     <Tab.Navigator
@@ -232,8 +285,7 @@ export default function RootNavigator() {
         options={{
           title: 'Watchlist',
           tabBarLabel: 'Watchlist',
-          tabBarBadge:
-            watchlistCount > 0 ? watchlistCount : undefined,
+          tabBarBadge: watchlistBadgeValue,
           tabBarBadgeStyle: {
             backgroundColor: colors.primary_container,
             color: colors.surface,

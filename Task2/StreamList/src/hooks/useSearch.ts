@@ -43,16 +43,29 @@ function mergeRecentTerms(term: string, previous: string[]): string[] {
 }
 
 function isCanceledSearchError(e: unknown): boolean {
-  if (e instanceof Error && e.name === 'AbortError') {
-    return true;
+  if (e instanceof Error) {
+    if (e.name === 'AbortError' || e.name === 'CanceledError') {
+      return true;
+    }
   }
-  if (typeof e === 'object' && e !== null && 'message' in e) {
-    const msg = String((e as { message: unknown }).message).toLowerCase();
-    return (
+  if (typeof e === 'object' && e !== null) {
+    const rec = e as Record<string, unknown>;
+    if (rec.__CANCEL__ === true) {
+      return true;
+    }
+    if (rec.code === 'ERR_CANCELED') {
+      return true;
+    }
+    const msg =
+      typeof rec.message === 'string' ? rec.message.toLowerCase() : '';
+    if (
       msg.includes('canceled') ||
+      msg.includes('cancelled') ||
       msg.includes('cancel') ||
       msg.includes('abort')
-    );
+    ) {
+      return true;
+    }
   }
   return false;
 }
@@ -115,7 +128,15 @@ export function useSearch() {
   const clearRecentSearches = useCallback(async () => {
     setRecentSearches([]);
     recentSearchesRef.current = [];
-    await AsyncStorage.removeItem(RECENT_KEY);
+    try {
+      await AsyncStorage.removeItem(RECENT_KEY);
+    } catch {
+      try {
+        await AsyncStorage.setItem(RECENT_KEY, JSON.stringify([]));
+      } catch {
+        // UI is already cleared; storage may be unavailable.
+      }
+    }
   }, []);
 
   const runSearch = useCallback(
@@ -168,6 +189,10 @@ export function useSearch() {
     [persistRecentList],
   );
 
+  /**
+   * Typed input: `searchMovies` runs only from the debounced `setTimeout` (never per keystroke).
+   * Genre chips / recent rows / retry use {@link runSearchNow} / {@link retrySearch} instead.
+   */
   const setQuery = useCallback(
     (q: string) => {
       setQueryState(q);

@@ -42,7 +42,7 @@ export function HeroCard({ movie, onDetailsPress }: HeroCardProps) {
   }
 
   const backdropUri = getImageUrl(movie.backdrop_path, 'w780');
-  const synopsisVisible = movie.overview.trim().length > 0;
+  const synopsisVisible = (movie.overview ?? '').trim().length > 0;
 
   return (
     <View style={[styles.cardOuter, { width: cardWidth }]}>
@@ -58,7 +58,7 @@ export function HeroCard({ movie, onDetailsPress }: HeroCardProps) {
           <View style={styles.backdropPlaceholder} />
         )}
         <LinearGradient
-          colors={['transparent', colors.surface]}
+          colors={[colors.transparent, colors.surface]}
           pointerEvents="none"
           style={styles.bottomGradient}
         />

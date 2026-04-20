@@ -29,17 +29,18 @@ export function WatchlistButton({
   releaseDate,
   genreIds,
 }: WatchlistButtonProps) {
-  const { addItem, removeItem, isInWatchlist, hydrated } = useWatchlistStore(
+  const { addItem, removeItem, hydrated, items } = useWatchlistStore(
     useShallow((s) => ({
       addItem: s.addItem,
       removeItem: s.removeItem,
-      isInWatchlist: s.isInWatchlist,
       hydrated: s.hydrated,
+      items: s.items,
     })),
   );
-  /** Subscribes to `items` so membership updates re-render (store `isInWatchlist` alone would not). */
-  const inWatchlist = useWatchlistStore((s) =>
-    s.items.some((item) => item.id === movieId),
+
+  const inWatchlist = useMemo(
+    () => items.some((item) => item.id === movieId),
+    [items, movieId],
   );
 
   const opacity = useRef(new Animated.Value(SHIMMER_MIN_OPACITY)).current;
@@ -71,7 +72,7 @@ export function WatchlistButton({
   const shimmerStyle = useMemo(() => ({ opacity }), [opacity]);
 
   const onPress = useCallback(() => {
-    if (isInWatchlist(movieId)) {
+    if (inWatchlist) {
       removeItem(movieId);
       return;
     }
@@ -87,7 +88,7 @@ export function WatchlistButton({
   }, [
     addItem,
     genreIds,
-    isInWatchlist,
+    inWatchlist,
     movieId,
     posterPath,
     releaseDate,

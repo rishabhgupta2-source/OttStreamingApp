@@ -42,3 +42,16 @@ test('HeroCard omits synopsis when overview is empty', () => {
     tree.unmount();
   });
 });
+
+test('HeroCard does not throw when overview is missing at runtime', () => {
+  ReactTestRenderer.act(() => {
+    const movieMissingOverview = {
+      ...sampleMovie,
+      overview: undefined,
+    } as unknown as Movie;
+    const tree = ReactTestRenderer.create(
+      <HeroCard movie={movieMissingOverview} onDetailsPress={() => {}} />,
+    );
+    tree.unmount();
+  });
+});

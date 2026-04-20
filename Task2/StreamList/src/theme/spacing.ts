@@ -35,6 +35,8 @@ export const spacing = {
   watchlist_empty_bookmark_icon_size: 80,
   /** Watchlist top bar avatar emoji size */
   watchlist_top_bar_avatar_emoji_size: 18,
+  /** StreamList wordmark / uppercase labels (1px tracking in mocks) */
+  brand_wordmark_letter_spacing: 1,
   /** Tight vertical gap (e.g. skeleton subtitle offset) */
   xxs: 6,
   xs:  4,

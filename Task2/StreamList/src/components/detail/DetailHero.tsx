@@ -95,7 +95,7 @@ export function DetailHero({
               style={styles.backdropImage}
             />
             <LinearGradient
-              colors={['transparent', colors.surface]}
+              colors={[colors.transparent, colors.surface]}
               pointerEvents="none"
               style={styles.bottomGradient}
             />

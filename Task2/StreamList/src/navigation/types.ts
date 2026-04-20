@@ -16,6 +16,17 @@ export type WatchlistStackParamList = {
   Detail: { movieId: number };
 };
 
+/** Params for `Detail` — identical on Home, Search, and Watchlist stacks. */
+export type MovieDetailRouteParams = Readonly<HomeStackParamList['Detail']>;
+
+/**
+ * `navigation.push('Detail', …)` from `DetailScreen`, where `navigation` is a
+ * union of native-stack navigators (TS cannot call `.push` on that union).
+ */
+export type DetailScreenPushNavigation = {
+  push(screen: 'Detail', params: MovieDetailRouteParams): void;
+};
+
 export type ProfileStackParamList = {
   ProfileMain: undefined;
 };

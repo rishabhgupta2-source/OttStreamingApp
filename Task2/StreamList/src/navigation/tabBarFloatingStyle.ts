@@ -1,3 +1,4 @@
+import { colors } from '../theme/colors';
 import {
   spacing,
   tab_bar_float_edge,
@@ -20,7 +21,7 @@ export function getFloatingTabBarStyle(bottomInset: number) {
     paddingBottom: bottomInset,
     borderTopWidth: 0,
     elevation: 0,
-    backgroundColor: 'transparent' as const,
+    backgroundColor: colors.transparent,
     borderRadius: spacing.xl,
     overflow: 'hidden' as const,
   };

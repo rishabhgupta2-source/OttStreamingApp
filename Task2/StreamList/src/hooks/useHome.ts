@@ -75,15 +75,23 @@ export function useHome() {
     });
   }, [selectedGenreId, genres.data]);
 
-  const genreDiscoverSections: GenreDiscoverSection[] = useMemo(
-    () =>
-      visibleGenreIds.map((genreId) => ({
-        genreId,
-        title:
-          genres.data.find((genre) => genre.id === genreId)?.name ?? 'Movies',
-      })),
-    [visibleGenreIds, genres.data],
-  );
+  const genreDiscoverSections: GenreDiscoverSection[] = useMemo(() => {
+    if (selectedGenreId !== null) {
+      return [
+        {
+          genreId: selectedGenreId,
+          title:
+            genres.data.find((genre) => genre.id === selectedGenreId)?.name ??
+            'Movies',
+        },
+      ];
+    }
+    return visibleGenreIds.map((genreId) => ({
+      genreId,
+      title:
+        genres.data.find((genre) => genre.id === genreId)?.name ?? 'Movies',
+    }));
+  }, [selectedGenreId, visibleGenreIds, genres.data]);
 
   const hasMoreGenres =
     selectedGenreId === null && visibleGenreIds.length < genres.data.length;

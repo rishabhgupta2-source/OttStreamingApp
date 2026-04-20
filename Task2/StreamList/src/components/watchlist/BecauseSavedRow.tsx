@@ -43,7 +43,8 @@ export function BecauseSavedRow({
     getSimilarMovies(mostRecentItem.id)
       .then((res) => {
         if (!cancelled) {
-          setSimilar(res.results);
+          const rows = Array.isArray(res.results) ? res.results : [];
+          setSimilar(rows);
         }
       })
       .catch(() => {

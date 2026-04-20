@@ -89,14 +89,17 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
       setDetailLoading(false);
 
       if (creditsResult.status === 'fulfilled') {
-        setCredits(filterTopBilledCast(creditsResult.value.cast));
+        const rawCast = creditsResult.value.cast;
+        const castList = Array.isArray(rawCast) ? rawCast : [];
+        setCredits(filterTopBilledCast(castList));
       } else {
         setCreditsError(getErrorMessage(creditsResult.reason));
       }
       setCreditsLoading(false);
 
       if (similarResult.status === 'fulfilled') {
-        setSimilar(similarResult.value.results);
+        const rawResults = similarResult.value.results;
+        setSimilar(Array.isArray(rawResults) ? rawResults : []);
       } else {
         setSimilarError(getErrorMessage(similarResult.reason));
       }
@@ -145,7 +148,9 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
         if (latestMovieIdRef.current !== id) {
           return;
         }
-        setCredits(filterTopBilledCast(value.cast));
+        const rawCast = value.cast;
+        const castList = Array.isArray(rawCast) ? rawCast : [];
+        setCredits(filterTopBilledCast(castList));
         setCreditsError(null);
       })
       .catch((reason: unknown) => {
@@ -170,7 +175,8 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
         if (latestMovieIdRef.current !== id) {
           return;
         }
-        setSimilar(value.results);
+        const rawResults = value.results;
+        setSimilar(Array.isArray(rawResults) ? rawResults : []);
         setSimilarError(null);
       })
       .catch((reason: unknown) => {

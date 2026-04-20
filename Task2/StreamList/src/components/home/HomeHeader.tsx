@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
     fontFamily: typography.headline_md.fontFamily,
     fontSize: typography.title_lg.fontSize,
-    letterSpacing: 1,
+    letterSpacing: spacing.brand_wordmark_letter_spacing,
     color: colors.primary_container,
   },
 });

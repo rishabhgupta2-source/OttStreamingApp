@@ -1,12 +1,8 @@
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { CommonActions } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BecauseSavedRow } from '../components/watchlist/BecauseSavedRow';
 import { WatchlistCollectionHeader } from '../components/watchlist/WatchlistCollectionHeader';
@@ -14,6 +10,7 @@ import { WatchlistEmptyState } from '../components/watchlist/WatchlistEmptyState
 import type { WatchlistFilter } from '../components/watchlist/WatchlistFilterChips';
 import { WatchlistFilterChips } from '../components/watchlist/WatchlistFilterChips';
 import { WatchlistGrid } from '../components/watchlist/WatchlistGrid';
+import { WatchlistHydrationSkeleton } from '../components/watchlist/WatchlistHydrationSkeleton';
 import { WatchlistTopBar } from '../components/watchlist/WatchlistTopBar';
 import type {
   RootTabParamList,
@@ -47,7 +44,12 @@ export function WatchlistScreen({ navigation }: WatchlistScreenProps) {
     const parent = navigation.getParent<
       BottomTabNavigationProp<RootTabParamList>
     >();
-    parent?.navigate('Home', { screen: 'HomeMain' });
+    parent?.dispatch(
+      CommonActions.navigate({
+        name: 'Home',
+        params: { screen: 'HomeMain' },
+      }),
+    );
   }, [navigation]);
 
   const onDetailsPress = useCallback(
@@ -59,10 +61,10 @@ export function WatchlistScreen({ navigation }: WatchlistScreenProps) {
 
   if (!hydrated) {
     return (
-      <View style={styles.hydrationRoot}>
-        <ActivityIndicator
-          color={colors.primary_container}
-          size="large"
+      <View style={[styles.root, { paddingTop: insets.top }]}>
+        <WatchlistTopBar hasItems={false} />
+        <WatchlistHydrationSkeleton
+          paddingBottom={scrollPaddingBelowFloatingTabBar(insets.bottom)}
         />
       </View>
     );
@@ -108,12 +110,6 @@ export function WatchlistScreen({ navigation }: WatchlistScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  hydrationRoot: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-  },
   root: {
     flex: 1,
     backgroundColor: colors.surface,

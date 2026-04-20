@@ -220,6 +220,25 @@ test('clearRecentSearches clears UI and AsyncStorage', async () => {
   unmount();
 });
 
+test('canceled request (ERR_CANCELED) does not set error state', async () => {
+  const canceled = new Error('');
+  Object.assign(canceled, { code: 'ERR_CANCELED' });
+  mockSearchMovies.mockRejectedValueOnce(canceled);
+  const { getLatest, unmount } = mountUseSearch();
+
+  await act(async () => {
+    getLatest().runSearchNow('ghost');
+  });
+  await act(async () => {
+    await flushMicrotasks();
+  });
+
+  expect(getLatest().error).toBeNull();
+  expect(getLatest().loading).toBe(false);
+
+  unmount();
+});
+
 test('search API error exposes message and clears results', async () => {
   mockSearchMovies.mockRejectedValue(new Error('Network down'));
   const { getLatest, unmount } = mountUseSearch();

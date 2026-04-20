@@ -260,7 +260,7 @@ export function SearchDefaultView({
                     <View style={styles.featuredPlaceholder} />
                   )}
                   <LinearGradient
-                    colors={['transparent', colors.surface]}
+                    colors={[colors.transparent, colors.surface]}
                     pointerEvents="none"
                     style={styles.featuredGradient}
                   />

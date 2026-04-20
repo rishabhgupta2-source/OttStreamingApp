@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     borderColor: colors.outline_variant,
   },
   containerUnfocused: {
-    borderColor: 'transparent',
+    borderColor: colors.transparent,
   },
   searchIcon: {
     marginRight: spacing.sm,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: spacing.xl + spacing.sm,
     paddingVertical: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: colors.transparent,
     color: colors.on_surface,
     ...typography.body_md,
   },

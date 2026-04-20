@@ -1,7 +1,4 @@
-import type {
-  NativeStackNavigationProp,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useLayoutEffect, useMemo } from 'react';
 import {
   ScrollView,
@@ -24,6 +21,7 @@ import {
   hiddenTabBarStyle,
 } from '../navigation/tabBarFloatingStyle';
 import type {
+  DetailScreenPushNavigation,
   HomeStackParamList,
   SearchStackParamList,
   WatchlistStackParamList,
@@ -64,10 +62,7 @@ export function DetailScreen({ navigation, route }: DetailScreenProps) {
 
   const onSimilarCardPress = useCallback(
     (id: number) => {
-      const nav = navigation as NativeStackNavigationProp<
-        HomeStackParamList,
-        'Detail'
-      >;
+      const nav = navigation as DetailScreenPushNavigation;
       nav.push('Detail', { movieId: id });
     },
     [navigation],

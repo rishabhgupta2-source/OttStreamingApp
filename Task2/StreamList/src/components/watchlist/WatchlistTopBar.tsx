@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   brand: {
     fontFamily: typography.headline_md.fontFamily,
     fontSize: typography.title_lg.fontSize,
-    letterSpacing: 1,
+    letterSpacing: spacing.brand_wordmark_letter_spacing,
   },
   right: {
     flexDirection: 'row',

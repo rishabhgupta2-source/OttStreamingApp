@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
   label: {
     marginLeft: spacing.sm,
-    letterSpacing: 1,
+    letterSpacing: spacing.brand_wordmark_letter_spacing,
     color: colors.on_surface_variant,
     textTransform: 'uppercase',
   },

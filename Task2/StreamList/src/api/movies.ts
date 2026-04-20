@@ -60,7 +60,8 @@ export const searchMovies = (
   signal?: AbortSignal,
 ): Promise<PaginatedResponse<Movie>> =>
   apiClient
-    .get(`/search/movie?query=${encodeURIComponent(query)}&page=${page}`, {
+    .get<PaginatedResponse<Movie>>('/search/movie', {
+      params: { query, page },
       signal,
     })
     .then((r) => r.data);

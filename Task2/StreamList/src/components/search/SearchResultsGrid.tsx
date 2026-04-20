@@ -8,6 +8,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import type { Movie } from '../../api/types';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
@@ -128,9 +129,14 @@ export function SearchResultsGrid({
 
       {showZeroState ? (
         <View style={styles.zeroRoot}>
-          <Text accessible={false} style={styles.zeroIcon}>
-            🔍
-          </Text>
+          <MaterialIcons
+            accessibilityElementsHidden
+            color={colors.on_surface_variant}
+            importantForAccessibility="no-hide-descendants"
+            name="search"
+            size={spacing.massive}
+            style={styles.zeroSearchIcon}
+          />
           <Text style={[typography.headline_md, styles.zeroTitle]}>
             {`No results for '${trimmedQuery}'`}
           </Text>
@@ -183,8 +189,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.massive + spacing.md,
   },
-  zeroIcon: {
-    fontSize: spacing.massive,
+  zeroSearchIcon: {
     marginBottom: spacing.lg,
   },
   zeroTitle: {

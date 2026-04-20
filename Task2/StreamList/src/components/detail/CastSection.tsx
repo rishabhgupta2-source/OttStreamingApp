@@ -207,6 +207,7 @@ const styles = StyleSheet.create({
     ...typography.body_md,
     color: colors.on_surface_variant,
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
   },
   listContent: {
     paddingHorizontal: spacing.lg,

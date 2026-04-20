@@ -21,6 +21,8 @@ export const colors = {
   on_surface_variant:        '#E4BDBA',  // Secondary metadata text
 
   // Utility
+  /** RN / gradients: use instead of string literal `'transparent'`. */
+  transparent:               'transparent',
   outline_variant:           'rgba(255,255,255,0.15)', // Ghost borders (accessibility only)
   tab_bar_overlay:           'rgba(35, 35, 35, 0.70)',
   /** Detail top bar: translucent scrim behind back / share (readable on bright hero). */
