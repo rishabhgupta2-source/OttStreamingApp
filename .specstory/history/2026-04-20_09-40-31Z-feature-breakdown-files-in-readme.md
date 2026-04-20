@@ -457,4 +457,335 @@ _**Agent (default)**_
 <think><details><summary>Thought Process</summary>
 **Committing changes**
 
-I'll commit only the documentation files to keep the commit focused and reviewable. I'm staging only the three documentation files for the feature breakdown README work. I'm committing only the README documentation changes for the feature breakdown. </details></think>
+I'll commit only the documentation files to keep the commit focused and reviewable. I'm staging only the three documentation files for the feature breakdown README work. I'm committing only the README documentation changes for the feature breakdown. 
+
+I'm staging and committing only the README documentation changes for StreamList feature breakdowns. </details></think>
+
+_**Agent (default)**_
+
+Committing only the feature-breakdown documentation files (README updates). Leaving other modified source files unstaged so the commit stays focused and reviewable.
+
+
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git add Task2/StreamList/README.md Task2/StreamList/docs/README.md .cursor/features/README.md && git commit --trailer "Made-with: Cursor" -m "docs(StreamList): document feature breakdowns in README
+
+- Add TOC entry and Feature breakdowns section with links to .cursor/features
+- List home, search, detail, and watchlist breakdowns plus index README
+- Align docs/README.md and .cursor/features/README.md with full screen set"</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git add Task2/StreamList/README.md Task2/StreamList/docs/README.md .cursor/features/README.md && git commit --trailer "Made-with: Cursor" -m "docs(StreamList): document feature breakdowns in README
+
+- Add TOC entry and Feature breakdowns section with links to .cursor/features
+- List home, search, detail, and watchlist breakdowns plus index README
+- Align docs/README.md and .cursor/features/README.md with full screen set"
+```
+
+```
+[master fbd1ec8] docs(StreamList): document feature breakdowns in README
+ Committer: Rishabh Gupta &lt;rishabhgupta@Rishabh-Guptas-MacBook-Pro.local&gt;
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 242 insertions(+), 59 deletions(-)
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master
+```
+
+```
+To https://github.com/rishabhgupta2-source/OttStreamingApp.git
+   a826bb5..fbd1ec8  master -&gt; master
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+Here is what was done.
+
+### Commit
+- **Hash:** `fbd1ec8`
+- **Message:**
+
+```
+docs(StreamList): document feature breakdowns in README
+
+- Add TOC entry and Feature breakdowns section with links to .cursor/features
+- List home, search, detail, and watchlist breakdowns plus index README
+- Align docs/README.md and .cursor/features/README.md with full screen set
+```
+
+### Files in this commit
+- `Task2/StreamList/README.md`
+- `Task2/StreamList/docs/README.md`
+- `.cursor/features/README.md`
+
+### Push
+- Pushed to **`origin/master`** (`a826bb5..fbd1ec8`).
+
+### Note
+Other local edits (StreamList source, tests, ADR, `.specstory`, untracked files, etc.) were **not** included so this stays a documentation-only commit. Say if you want those grouped into separate commits or one larger commit.
+
+---
+
+_**User**_
+
+remaining changes also pls commit and push
+
+---
+
+_**Agent (default)**_
+
+<think><details><summary>Thought Process</summary>
+**Checking git status**
+
+I'm checking git status to identify uncommitted changes before staging and committing them. </details></think>
+
+_**Agent (default)**_
+
+Checking remaining changes and committing them with an appropriate message.
+
+
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git status && echo '---' && git diff --stat</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git status && echo '---' && git diff --stat
+```
+
+```
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes to be committed:
+  (use "git restore --staged &lt;file&gt;..." to unstage)
+	modified:   .specstory/history/2026-04-15_07-47-30Z-typescript-interfaces-for-movie-api.md
+	new file:   .specstory/history/2026-04-20_09-40-31Z-feature-breakdown-files-in-readme.md
+	modified:   .specstory/statistics.json
+	new file:   README.md
+	modified:   Task2/StreamList/__tests__/HeroCard.test.tsx
+	new file:   Task2/StreamList/__tests__/useMovieDetail.test.tsx
+	modified:   Task2/StreamList/__tests__/useSearch.test.tsx
+	modified:   Task2/StreamList/docs/ADR.md
+	modified:   Task2/StreamList/src/api/movies.ts
+	new file:   Task2/StreamList/src/components/common/ScreenErrorBoundary.tsx
+	modified:   Task2/StreamList/src/components/detail/CastSection.tsx
+	modified:   Task2/StreamList/src/components/detail/DetailHero.tsx
+	modified:   Task2/StreamList/src/components/detail/WatchlistButton.tsx
+	modified:   Task2/StreamList/src/components/home/HeroCard.tsx
+	modified:   Task2/StreamList/src/components/home/HomeHeader.tsx
+	modified:   Task2/StreamList/src/components/home/LoadingMoreIndicator.tsx
+	modified:   Task2/StreamList/src/components/search/SearchBar.tsx
+	modified:   Task2/StreamList/src/components/search/SearchDefaultView.tsx
+	modified:   Task2/StreamList/src/components/search/SearchResultsGrid.tsx
+	modified:   Task2/StreamList/src/components/watchlist/BecauseSavedRow.tsx
+	new file:   Task2/StreamList/src/components/watchlist/WatchlistHydrationSkeleton.tsx
+	modified:   Task2/StreamList/src/components/watchlist/WatchlistTopBar.tsx
+	modified:   Task2/StreamList/src/hooks/useHome.ts
+	modified:   Task2/StreamList/src/hooks/useMovieDetail.ts
+	modified:   Task2/StreamList/src/hooks/useSearch.ts
+	modified:   Task2/StreamList/src/navigation/RootNavigator.tsx
+	modified:   Task2/StreamList/src/navigation/tabBarFloatingStyle.ts
+	modified:   Task2/StreamList/src/navigation/types.ts
+	modified:   Task2/StreamList/src/screens/DetailScreen.tsx
+	modified:   Task2/StreamList/src/screens/SearchScreen.tsx
+	modified:   Task2/StreamList/src/screens/WatchlistScreen.tsx
+	modified:   Task2/StreamList/src/theme/colors.ts
+	modified:   Task2/StreamList/src/theme/spacing.ts
+
+---
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+<think><details><summary>Thought Process</summary>
+**Committing changes**
+
+I'm committing the staged changes with a descriptive message including the new files and key components. I'm committing the staged changes with a comprehensive message covering StreamList improvements, tests, ADR, and Specstory updates. </details></think>
+
+_**Agent (default)**_
+
+Staged changes detected. Reviewing the staged diff summary to craft an accurate commit message:
+
+
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git diff --cached --stat</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git diff --cached --stat
+```
+
+```
+ ...7-47-30Z-typescript-interfaces-for-movie-api.md | 7437 +++++++++++++++++++-
+ ..._09-40-31Z-feature-breakdown-files-in-readme.md |  460 ++
+ .specstory/statistics.json                         |   17 +-
+ README.md                                          |   24 +
+ Task2/StreamList/__tests__/HeroCard.test.tsx       |   13 +
+ Task2/StreamList/__tests__/useMovieDetail.test.tsx |  174 +
+ Task2/StreamList/__tests__/useSearch.test.tsx      |   19 +
+ Task2/StreamList/docs/ADR.md                       |  297 +
+ Task2/StreamList/src/api/movies.ts                 |    3 +-
+ .../src/components/common/ScreenErrorBoundary.tsx  |  119 +
+ .../src/components/detail/CastSection.tsx          |    1 +
+ .../src/components/detail/DetailHero.tsx           |    2 +-
+ .../src/components/detail/WatchlistButton.tsx      |   15 +-
+ Task2/StreamList/src/components/home/HeroCard.tsx  |    4 +-
+ .../StreamList/src/components/home/HomeHeader.tsx  |    2 +-
+ .../src/components/home/LoadingMoreIndicator.tsx   |    2 +-
+ .../StreamList/src/components/search/SearchBar.tsx |    4 +-
+ .../src/components/search/SearchDefaultView.tsx    |    2 +-
+ .../src/components/search/SearchResultsGrid.tsx    |   15 +-
+ .../src/components/watchlist/BecauseSavedRow.tsx   |    3 +-
+ .../watchlist/WatchlistHydrationSkeleton.tsx       |  116 +
+ .../src/components/watchlist/WatchlistTopBar.tsx   |    2 +-
+ Task2/StreamList/src/hooks/useHome.ts              |   26 +-
+ Task2/StreamList/src/hooks/useMovieDetail.ts       |   14 +-
+ Task2/StreamList/src/hooks/useSearch.ts            |   39 +-
+ Task2/StreamList/src/navigation/RootNavigator.tsx  |   74 +-
+ .../src/navigation/tabBarFloatingStyle.ts          |    3 +-
+ Task2/StreamList/src/navigation/types.ts           |   11 +
+ Task2/StreamList/src/screens/DetailScreen.tsx      |   11 +-
+ Task2/StreamList/src/screens/SearchScreen.tsx      |    2 +-
+ Task2/StreamList/src/screens/WatchlistScreen.tsx   |   30 +-
+ Task2/StreamList/src/theme/colors.ts               |    2 +
+ Task2/StreamList/src/theme/spacing.ts              |    2 +
+ 33 files changed, 8859 insertions(+), 86 deletions(-)
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+<think><details><summary>Thought Process</summary>
+**Committing changes**
+
+I'm committing the large .specstory history file with 7437 lines added, along with all staged changes. </details></think>
+
+_**Agent (default)**_
+
+Committing staged changes (StreamList app updates, ADR, tests, monorepo README, and .specstory logs) and pushing.
+
+
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git commit --trailer "Made-with: Cursor" -m "feat(StreamList): error boundaries, watchlist UX, and hook refinements
+
+- Add ScreenErrorBoundary and wrap stack screens in RootNavigator
+- Watchlist hydration skeleton and WatchlistScreen flow updates
+- Refine useHome, useMovieDetail, and useSearch; extend navigation types
+- Adjust movies API, theme tokens, and home/search/detail/watchlist UI
+- Expand docs/ADR.md; add useMovieDetail tests; update Hero and useSearch tests
+- Add monorepo root README; update .specstory history and statistics"</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git commit --trailer "Made-with: Cursor" -m "feat(StreamList): error boundaries, watchlist UX, and hook refinements
+
+- Add ScreenErrorBoundary and wrap stack screens in RootNavigator
+- Watchlist hydration skeleton and WatchlistScreen flow updates
+- Refine useHome, useMovieDetail, and useSearch; extend navigation types
+- Adjust movies API, theme tokens, and home/search/detail/watchlist UI
+- Expand docs/ADR.md; add useMovieDetail tests; update Hero and useSearch tests
+- Add monorepo root README; update .specstory history and statistics"
+```
+
+```
+[master 574c97b] feat(StreamList): error boundaries, watchlist UX, and hook refinements
+ Committer: Rishabh Gupta &lt;rishabhgupta@Rishabh-Guptas-MacBook-Pro.local&gt;
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 33 files changed, 8859 insertions(+), 86 deletions(-)
+ create mode 100644 .specstory/history/2026-04-20_09-40-31Z-feature-breakdown-files-in-readme.md
+ create mode 100644 README.md
+ create mode 100644 Task2/StreamList/__tests__/useMovieDetail.test.tsx
+ create mode 100644 Task2/StreamList/src/components/common/ScreenErrorBoundary.tsx
+ create mode 100644 Task2/StreamList/src/components/watchlist/WatchlistHydrationSkeleton.tsx
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
