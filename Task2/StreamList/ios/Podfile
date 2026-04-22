@@ -19,16 +19,32 @@ target 'StreamList' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   post_install do |installer|
+    # 1. Standard React Native post-install steps
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
+
+    # 2. Selective C++ Standard Fix
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        
+        # If it's the problematic libraries, downgrade to C++17
+        if target.name.include?('fmt') || target.name.include?('Yoga') || target.name.include?('glog')
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++17'
+        else
+          # Everything else (ReactCommon, etc.) gets C++20
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++20'
+        end
+
+        # Additional fix for newer Xcode compatibility
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'FMT_EXCEPTIONS=0']
+      end
+    end
   end
 end
