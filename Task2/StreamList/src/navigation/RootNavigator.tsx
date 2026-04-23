@@ -1,4 +1,3 @@
-import { BlurView } from '@react-native-community/blur';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +17,7 @@ import { useWatchlistStore } from '../store/watchlistStore';
 import { colors } from '../theme/colors';
 import { spacing, scrollPaddingBelowFloatingTabBar } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import { StreamListTabBarBackground } from './StreamListTabBarBackground';
 import { getFloatingTabBarStyle } from './tabBarFloatingStyle';
 import type {
   HomeStackParamList,
@@ -39,6 +39,18 @@ const stackScreenOptions = {
   contentStyle: { backgroundColor: colors.surface },
 };
 
+/** Detail only: avoids iOS 26+ UIScrollEdgeEffect dimming over the whole screen (native stack + ScrollView). */
+const detailScreenOptions = {
+  title: 'Detail' as const,
+  fullScreenGestureShadowEnabled: false,
+  scrollEdgeEffects: {
+    top: 'hidden' as const,
+    bottom: 'hidden' as const,
+    left: 'hidden' as const,
+    right: 'hidden' as const,
+  },
+};
+
 const styles = StyleSheet.create({
   placeholder: {
     flex: 1,
@@ -49,15 +61,6 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: colors.on_surface,
     ...typography.title_lg,
-  },
-  tabBarBlurRoot: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-    borderRadius: spacing.xl,
-  },
-  tabBarTint: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.surface,
   },
 });
 
@@ -73,20 +76,6 @@ function PlaceholderScreen({ title }: Readonly<{ title: string }>) {
       ]}
     >
       <Text style={styles.placeholderText}>{title}</Text>
-    </View>
-  );
-}
-
-function TabBarBackground() {
-  return (
-    <View style={styles.tabBarBlurRoot}>
-      <BlurView
-        style={[StyleSheet.absoluteFill, styles.tabBarBlurRoot]}
-        blurType="dark"
-        blurAmount={20}
-        reducedTransparencyFallbackColor={colors.tab_bar_overlay}
-      />
-      <View style={styles.tabBarTint} pointerEvents="none" />
     </View>
   );
 }
@@ -120,7 +109,7 @@ function HomeStackNavigator() {
       <HomeStack.Screen
         component={DetailScreenWithErrorBoundary}
         name="Detail"
-        options={{ title: 'Detail' }}
+        options={detailScreenOptions}
       />
     </HomeStack.Navigator>
   );
@@ -147,7 +136,7 @@ function SearchStackNavigator() {
       <SearchStack.Screen
         component={DetailScreenWithErrorBoundary}
         name="Detail"
-        options={{ title: 'Detail' }}
+        options={detailScreenOptions}
       />
     </SearchStack.Navigator>
   );
@@ -176,7 +165,7 @@ function WatchlistStackNavigator() {
       <WatchlistStack.Screen
         component={DetailScreenWithErrorBoundary}
         name="Detail"
-        options={{ title: 'Detail' }}
+        options={detailScreenOptions}
       />
     </WatchlistStack.Navigator>
   );
@@ -256,7 +245,7 @@ export default function RootNavigator() {
           justifyContent: 'center',
         },
         tabBarStyle: getFloatingTabBarStyle(insets.bottom),
-        tabBarBackground: TabBarBackground,
+        tabBarBackground: StreamListTabBarBackground,
         tabBarIcon: ({ color, focused }) => {
           const routeName = route.name as keyof RootTabParamList;
           return (

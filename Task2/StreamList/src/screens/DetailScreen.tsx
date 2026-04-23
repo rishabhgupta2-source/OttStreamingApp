@@ -16,6 +16,7 @@ import { MoreLikeThisSection } from '../components/detail/MoreLikeThisSection';
 import { SynopsisSection } from '../components/detail/SynopsisSection';
 import { WatchlistButton } from '../components/detail/WatchlistButton';
 import { useMovieDetail } from '../hooks/useMovieDetail';
+import { StreamListTabBarBackground } from '../navigation/StreamListTabBarBackground';
 import {
   getFloatingTabBarStyle,
   hiddenTabBarStyle,
@@ -44,11 +45,16 @@ export function DetailScreen({ navigation, route }: DetailScreenProps) {
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
     const parent = navigation.getParent();
-    parent?.setOptions({ tabBarStyle: hiddenTabBarStyle });
+    parent?.setOptions({
+      tabBarStyle: hiddenTabBarStyle,
+      /** Drop blur layer while Detail is focused — Android can keep a full-screen dim from absoluteFill BlurView. */
+      tabBarBackground: () => null,
+    });
     return () => {
-      navigation
-        .getParent()
-        ?.setOptions({ tabBarStyle: getFloatingTabBarStyle(insets.bottom) });
+      navigation.getParent()?.setOptions({
+        tabBarStyle: getFloatingTabBarStyle(insets.bottom),
+        tabBarBackground: StreamListTabBarBackground,
+      });
     };
   }, [navigation, insets.bottom]);
 
