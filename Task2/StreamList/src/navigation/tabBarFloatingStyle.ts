@@ -1,28 +1,25 @@
 import { colors } from '../theme/colors';
-import {
-  spacing,
-  tab_bar_float_edge,
-  tabBarStackHeight,
-} from '../theme/spacing';
+import { spacing, tabBarStackHeight } from '../theme/spacing';
 
 /**
- * Shared floating tab bar geometry (used by RootNavigator and DetailScreen cleanup)
- * so `tabBarStyle` always matches after leaving Detail.
+ * Shared tab bar geometry (used by RootNavigator and DetailScreen cleanup)
+ * so `tabBarStyle` always matches after leaving Detail. Full-width bar flush to
+ * bottom and horizontal screen edges (not a floating pill).
  */
 export function getFloatingTabBarStyle(bottomInset: number) {
   const tabBarHeight = tabBarStackHeight + bottomInset;
   return {
     position: 'absolute' as const,
-    left: tab_bar_float_edge,
-    right: tab_bar_float_edge,
-    bottom: tab_bar_float_edge,
+    left: 0,
+    right: 0,
+    bottom: 0,
     height: tabBarHeight,
     paddingTop: spacing.sm,
     paddingBottom: bottomInset,
     borderTopWidth: 0,
     elevation: 0,
     backgroundColor: colors.transparent,
-    borderRadius: spacing.xl,
+    borderRadius: 0,
     overflow: 'hidden' as const,
   };
 }

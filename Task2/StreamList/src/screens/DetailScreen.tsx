@@ -97,7 +97,7 @@ export function DetailScreen({ navigation, route }: DetailScreenProps) {
         style={[
           styles.navActionBar,
           {
-            paddingTop: insets.top + spacing.sm,
+            paddingTop: insets.top + spacing.xs,
           },
         ]}
       >
@@ -105,10 +105,10 @@ export function DetailScreen({ navigation, route }: DetailScreenProps) {
           accessibilityLabel="Go back"
           accessibilityRole="button"
           hitSlop={{
-            top: spacing.sm,
-            bottom: spacing.sm,
-            left: spacing.sm,
-            right: spacing.sm,
+            top: spacing.md,
+            bottom: spacing.md,
+            left: spacing.md,
+            right: spacing.md,
           }}
           onPress={() => {
             navigation.goBack();
@@ -118,7 +118,7 @@ export function DetailScreen({ navigation, route }: DetailScreenProps) {
           <MaterialIcons
             color={colors.detail_nav_on_scrim}
             name="arrow-back"
-            size={spacing.huge}
+            size={spacing.xxl}
           />
         </TouchableOpacity>
         <View
@@ -130,7 +130,7 @@ export function DetailScreen({ navigation, route }: DetailScreenProps) {
           <MaterialIcons
             color={colors.detail_nav_on_scrim}
             name="share"
-            size={spacing.huge}
+            size={spacing.xxl}
           />
         </View>
       </View>
@@ -203,12 +203,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.xs,
     backgroundColor: colors.detail_nav_action_scrim,
   },
   navIconTap: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.xs,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -1,13 +1,12 @@
 import { BlurView } from '@react-native-community/blur';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
 
 const styles = StyleSheet.create({
   tabBarBlurRoot: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
-    borderRadius: spacing.xl,
+    borderRadius: 0,
   },
   tabBarTint: {
     ...StyleSheet.absoluteFillObject,
@@ -16,7 +15,7 @@ const styles = StyleSheet.create({
 });
 
 /**
- * Blur + tint behind the floating tab bar. Extracted so DetailScreen can remove
+ * Blur + tint behind the bottom tab bar. Extracted so DetailScreen can remove
  * `tabBarBackground` while Detail is shown (Android otherwise may keep a full-screen dim from BlurView).
  */
 export function StreamListTabBarBackground() {

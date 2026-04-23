@@ -51,12 +51,6 @@ export const spacing = {
 };
 
 /**
- * Inset of floating tab bar from left, right, and bottom screen edges (RootNavigator).
- * Matches mock “pill” that does not touch the bezel.
- */
-export const tab_bar_float_edge = spacing.sm;
-
-/**
  * Inner vertical stack for tab bar (icon band + label + padding), before safe-area
  * padding inside the bar. Keep aligned with `tabBarStyle` / icon sizes in RootNavigator.
  */
@@ -69,16 +63,11 @@ export const tabBarStackHeight =
   spacing.sm;
 
 /**
- * ScrollView `paddingBottom` so content clears the floating tab pill and matches
+ * ScrollView `paddingBottom` so content clears the bottom tab bar and matches
  * Home / Search / other tabs.
  */
 export function scrollPaddingBelowFloatingTabBar(
   safeAreaBottomInset: number,
 ): number {
-  return (
-    tab_bar_float_edge +
-    tabBarStackHeight +
-    safeAreaBottomInset +
-    spacing.lg
-  );
+  return tabBarStackHeight + safeAreaBottomInset + spacing.lg;
 }
