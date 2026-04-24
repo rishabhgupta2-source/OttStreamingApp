@@ -29,7 +29,6 @@ function SectionHeader() {
   return (
     <View style={styles.headerRow}>
       <Text style={styles.headerTitle}>More Like This</Text>
-      <Text style={styles.seeAll}>See All</Text>
     </View>
   );
 }
@@ -104,6 +103,7 @@ export function MoreLikeThisSection({
         data={movies}
         horizontal
         keyExtractor={keyExtractor}
+        nestedScrollEnabled
         renderItem={renderMovie}
         showsHorizontalScrollIndicator={false}
       />
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xl,
@@ -126,10 +126,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...typography.headline_md,
     color: colors.on_surface,
-  },
-  seeAll: {
-    ...typography.title_sm,
-    color: colors.primary_container,
   },
   loadingScrollContent: {
     flexDirection: 'row',

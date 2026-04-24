@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { searchMovies } from '../api/movies';
-import type { Movie } from '../api/types';
+import type { Movie, PaginatedResponse } from '../api/types';
 import { getErrorMessage } from '../utils/getErrorMessage';
 
 const RECENT_KEY = 'streamlist_recent_searches';
@@ -26,12 +26,41 @@ function dedupeMoviesById(movies: Movie[]): Movie[] {
   const seen = new Set<number>();
   const out: Movie[] = [];
   for (const movie of movies) {
-    if (!seen.has(movie.id)) {
-      seen.add(movie.id);
-      out.push(movie);
+    if (
+      typeof movie.id !== 'number' ||
+      !Number.isFinite(movie.id) ||
+      seen.has(movie.id)
+    ) {
+      continue;
     }
+    seen.add(movie.id);
+    out.push(movie);
   }
   return out;
+}
+
+function normalizeSearchPage(res: PaginatedResponse<Movie>): {
+  results: Movie[];
+  page: number;
+  total_pages: number;
+  total_results: number;
+} {
+  const results = Array.isArray(res.results) ? res.results : [];
+  const page =
+    typeof res.page === 'number' && Number.isFinite(res.page) && res.page >= 1
+      ? res.page
+      : 1;
+  const total_pages =
+    typeof res.total_pages === 'number' &&
+    Number.isFinite(res.total_pages) &&
+    res.total_pages >= 1
+      ? res.total_pages
+      : 1;
+  const total_results =
+    typeof res.total_results === 'number' && Number.isFinite(res.total_results)
+      ? res.total_results
+      : 0;
+  return { results, page, total_pages, total_results };
 }
 
 function mergeRecentTerms(term: string, previous: string[]): string[] {
@@ -79,6 +108,9 @@ export function useSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalResults, setTotalResults] = useState(0);
+  const [searchPage, setSearchPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -145,7 +177,10 @@ export function useSearch() {
       if (trimmed === '') {
         setResults([]);
         setTotalResults(0);
+        setSearchPage(0);
+        setTotalPages(1);
         setLoading(false);
+        setLoadingMore(false);
         setError(null);
         return;
       }
@@ -163,11 +198,11 @@ export function useSearch() {
         if (seq !== searchSeqRef.current) {
           return;
         }
-        const rows = Array.isArray(res.results) ? res.results : [];
-        setResults(dedupeMoviesById(rows));
-        setTotalResults(
-          typeof res.total_results === 'number' ? res.total_results : 0,
-        );
+        const slice = normalizeSearchPage(res);
+        setResults(dedupeMoviesById(slice.results));
+        setTotalResults(slice.total_results);
+        setSearchPage(slice.page);
+        setTotalPages(slice.total_pages);
         const nextRecent = mergeRecentTerms(trimmed, recentSearchesRef.current);
         await persistRecentList(nextRecent);
       } catch (e: unknown) {
@@ -180,6 +215,8 @@ export function useSearch() {
         setError(getErrorMessage(e));
         setResults([]);
         setTotalResults(0);
+        setSearchPage(0);
+        setTotalPages(1);
       } finally {
         if (seq === searchSeqRef.current) {
           setLoading(false);
@@ -188,6 +225,46 @@ export function useSearch() {
     },
     [persistRecentList],
   );
+
+  const loadMoreSearch = useCallback(async () => {
+    const trimmed = query.trim();
+    if (trimmed === '' || loading || loadingMore) {
+      return;
+    }
+    if (searchPage < 1 || searchPage >= totalPages) {
+      return;
+    }
+
+    const seq = searchSeqRef.current;
+    const nextPage = searchPage + 1;
+    setLoadingMore(true);
+    setError(null);
+
+    try {
+      const res = await searchMovies(trimmed, nextPage);
+      if (seq !== searchSeqRef.current) {
+        return;
+      }
+      if (query.trim() !== trimmed) {
+        return;
+      }
+      const slice = normalizeSearchPage(res);
+      setResults((prev) => dedupeMoviesById([...prev, ...slice.results]));
+      setTotalResults(slice.total_results);
+      setSearchPage(slice.page);
+      setTotalPages(slice.total_pages);
+    } catch (e: unknown) {
+      if (isCanceledSearchError(e)) {
+        return;
+      }
+      if (seq !== searchSeqRef.current) {
+        return;
+      }
+      setError(getErrorMessage(e));
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loading, loadingMore, query, searchPage, totalPages]);
 
   /**
    * Typed input: `searchMovies` runs only from the debounced `setTimeout` (never per keystroke).
@@ -206,7 +283,10 @@ export function useSearch() {
         abortControllerRef.current = null;
         setResults([]);
         setTotalResults(0);
+        setSearchPage(0);
+        setTotalPages(1);
         setLoading(false);
+        setLoadingMore(false);
         setError(null);
         return;
       }
@@ -233,7 +313,10 @@ export function useSearch() {
         abortControllerRef.current = null;
         setResults([]);
         setTotalResults(0);
+        setSearchPage(0);
+        setTotalPages(1);
         setLoading(false);
+        setLoadingMore(false);
         setError(null);
         return;
       }
@@ -257,6 +340,8 @@ export function useSearch() {
     };
   }, []);
 
+  const hasMore = searchPage >= 1 && searchPage < totalPages;
+
   return {
     query,
     setQuery,
@@ -264,8 +349,11 @@ export function useSearch() {
     retrySearch,
     results,
     loading,
+    loadingMore,
     error,
     totalResults,
+    hasMore,
+    loadMoreSearch,
     recentSearches,
     saveRecentSearch,
     clearRecentSearches,

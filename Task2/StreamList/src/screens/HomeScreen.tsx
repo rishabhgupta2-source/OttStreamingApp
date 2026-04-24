@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
@@ -27,6 +27,7 @@ export type HomeScreenProps = NativeStackScreenProps<
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
+  const [nearVerticalEnd, setNearVerticalEnd] = useState(false);
   const {
     genres,
     trending,
@@ -38,17 +39,28 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
     setSelectedGenre,
   } = useHome();
 
-  const [nearVerticalEnd, setNearVerticalEnd] = useState(false);
-
-  const genreMap = genres.data.reduce<Record<number, string>>(
-    (map, g) => ({ ...map, [g.id]: g.name }),
-    {},
+  const genreMap = useMemo(
+    () =>
+      genres.data.reduce<Record<number, string>>((map, g) => {
+        if (typeof g.id === 'number' && Number.isFinite(g.id)) {
+          return { ...map, [g.id]: g.name };
+        }
+        return map;
+      }, {}),
+    [genres.data],
   );
 
   const heroMovie =
-    trending.loading && trending.data.length === 0
+    trending.loading &&
+    trending.data.length === 0 &&
+    trending.error === null
       ? null
       : (trending.data[0] ?? null);
+
+  const heroLoading =
+    trending.loading &&
+    trending.data.length === 0 &&
+    trending.error === null;
 
   const showHorizontalLoadMoreFooter =
     (trending.hasMore &&
@@ -58,8 +70,14 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
       topRated.loading &&
       topRated.data.length > 0);
 
+  /** Near bottom on "All" while more genre rows exist — genre append is sync; indicator reflects scroll + remaining work. */
   const showVerticalGenreLoadMoreFooter =
-    selectedGenreId === null && hasMoreGenres && nearVerticalEnd;
+    selectedGenreId === null &&
+    nearVerticalEnd &&
+    hasMoreGenres &&
+    genres.data.length > 0 &&
+    genres.error === null &&
+    !genres.loading;
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -76,9 +94,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
     [hasMoreGenres, loadMoreGenres],
   );
 
-  const navigateToDetail = (movieId: number) => {
-    navigation.navigate('Detail', { movieId });
-  };
+  const navigateToDetail = useCallback(
+    (movieId: number) => {
+      navigation.navigate('Detail', { movieId });
+    },
+    [navigation],
+  );
 
   return (
     <ScrollView
@@ -95,31 +116,42 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
     >
       <HomeHeader />
       <GenreFilterStrip
+        error={genres.error}
         genres={genres.data}
         loading={genres.loading}
+        onRetry={genres.refetch}
         onSelectGenre={setSelectedGenre}
         selectedGenreId={selectedGenreId}
       />
       <HeroCard
+        loadErrorMessage={trending.error}
+        loading={heroLoading}
         movie={heroMovie}
         onDetailsPress={navigateToDetail}
+        onRetryLoad={trending.refetch}
       />
-      <ContentRow
-        data={trending.data}
-        genreMap={genreMap}
-        hasMore={trending.hasMore}
-        loadMore={trending.loadMore}
-        loading={trending.loading}
-        onCardPress={navigateToDetail}
-        title="Trending Now"
-      />
+      {trending.data.length > 0 || trending.loading ? (
+        <ContentRow
+          data={trending.data}
+          error={trending.data.length > 0 ? trending.error : null}
+          genreMap={genreMap}
+          hasMore={trending.hasMore}
+          loadMore={trending.loadMore}
+          loading={trending.loading}
+          onCardPress={navigateToDetail}
+          onRetry={trending.data.length > 0 ? trending.refetch : undefined}
+          title="Trending Now"
+        />
+      ) : null}
       <ContentRow
         data={topRated.data}
+        error={topRated.error}
         genreMap={genreMap}
         hasMore={topRated.hasMore}
         loadMore={topRated.loadMore}
         loading={topRated.loading}
         onCardPress={navigateToDetail}
+        onRetry={topRated.refetch}
         title="Top Rated"
       />
       {genreDiscoverSections.map((section) => (

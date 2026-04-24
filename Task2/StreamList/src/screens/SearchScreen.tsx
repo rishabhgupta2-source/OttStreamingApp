@@ -38,8 +38,11 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
     retrySearch,
     results,
     loading,
+    loadingMore,
     error,
     totalResults,
+    hasMore,
+    loadMoreSearch,
     recentSearches,
     clearRecentSearches,
   } = useSearch();
@@ -53,6 +56,10 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
   const handleClearRecent = useCallback(() => {
     clearRecentSearches().catch(() => {});
   }, [clearRecentSearches]);
+
+  const handleLoadMoreSearch = useCallback(() => {
+    loadMoreSearch().catch(() => {});
+  }, [loadMoreSearch]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.keyboardRoot}>
@@ -108,20 +115,25 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
               onGenreSelect={(name) => {
                 runSearchNow(name);
               }}
+              onRetryTrending={trendingForSearch.refetch}
               onSelectSearch={(term) => {
                 runSearchNow(term);
               }}
               recentSearches={recentSearches}
+              trendingError={trendingForSearch.error}
               trendingLoading={trendingForSearch.loading}
               trendingMovies={trendingForSearch.data}
             />
           ) : (
             <SearchResultsGrid
               error={error}
+              hasMore={hasMore}
               loading={loading}
+              loadingMore={loadingMore}
               onCardPress={(movieId) => {
                 navigation.navigate('Detail', { movieId });
               }}
+              onLoadMore={handleLoadMoreSearch}
               onRetry={retrySearch}
               query={query}
               results={results}

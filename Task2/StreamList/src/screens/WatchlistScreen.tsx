@@ -1,7 +1,7 @@
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { CommonActions } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BecauseSavedRow } from '../components/watchlist/BecauseSavedRow';
@@ -9,7 +9,10 @@ import { WatchlistCollectionHeader } from '../components/watchlist/WatchlistColl
 import { WatchlistEmptyState } from '../components/watchlist/WatchlistEmptyState';
 import type { WatchlistFilter } from '../components/watchlist/WatchlistFilterChips';
 import { WatchlistFilterChips } from '../components/watchlist/WatchlistFilterChips';
-import { WatchlistGrid } from '../components/watchlist/WatchlistGrid';
+import {
+  getFilteredWatchlistItems,
+  WatchlistGrid,
+} from '../components/watchlist/WatchlistGrid';
 import { WatchlistHydrationSkeleton } from '../components/watchlist/WatchlistHydrationSkeleton';
 import { WatchlistTopBar } from '../components/watchlist/WatchlistTopBar';
 import type {
@@ -59,6 +62,22 @@ export function WatchlistScreen({ navigation }: WatchlistScreenProps) {
     [navigation],
   );
 
+  const displayCount = useMemo(
+    () => getFilteredWatchlistItems(items, activeFilter).length,
+    [items, activeFilter],
+  );
+
+  const onBecauseSavedViewAll = useCallback(() => {
+    const last = items[items.length - 1];
+    if (last === undefined || last.mediaType !== 'movie') {
+      return;
+    }
+    navigation.navigate('SimilarFromWatchlist', {
+      movieId: last.id,
+      sourceTitle: last.title,
+    });
+  }, [items, navigation]);
+
   if (!hydrated) {
     return (
       <View style={[styles.root, { paddingTop: insets.top }]}>
@@ -83,10 +102,11 @@ export function WatchlistScreen({ navigation }: WatchlistScreenProps) {
               paddingBottom: scrollPaddingBelowFloatingTabBar(insets.bottom),
             },
           ]}
+          nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           style={styles.scroll}
         >
-          <WatchlistCollectionHeader itemCount={items.length} />
+          <WatchlistCollectionHeader itemCount={displayCount} />
           <WatchlistFilterChips
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}
@@ -102,6 +122,7 @@ export function WatchlistScreen({ navigation }: WatchlistScreenProps) {
           <BecauseSavedRow
             mostRecentItem={items[items.length - 1]}
             onCardPress={onDetailsPress}
+            onViewAllPress={onBecauseSavedViewAll}
           />
         </ScrollView>
       )}

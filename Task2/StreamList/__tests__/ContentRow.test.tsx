@@ -55,5 +55,33 @@ test('ContentRow skeleton, list, and empty states', () => {
       />,
     );
     empty.unmount();
+
+    const loadFailed = ReactTestRenderer.create(
+      <ContentRow
+        data={[]}
+        error="Request failed"
+        hasMore={false}
+        loading={false}
+        loadMore={() => {}}
+        onCardPress={() => {}}
+        onRetry={() => {}}
+        title="Trending"
+      />,
+    );
+    loadFailed.unmount();
+
+    const partialError = ReactTestRenderer.create(
+      <ContentRow
+        data={[movie]}
+        error="Could not load next page"
+        hasMore={false}
+        loading={false}
+        loadMore={() => {}}
+        onCardPress={() => {}}
+        onRetry={() => {}}
+        title="Trending"
+      />,
+    );
+    partialError.unmount();
   });
 });

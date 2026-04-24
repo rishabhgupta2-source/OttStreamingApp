@@ -10,10 +10,15 @@ function dedupeMoviesById(movies: Movie[]): Movie[] {
   const seen = new Set<number>();
   const out: Movie[] = [];
   for (const movie of movies) {
-    if (!seen.has(movie.id)) {
-      seen.add(movie.id);
-      out.push(movie);
+    if (
+      typeof movie.id !== 'number' ||
+      !Number.isFinite(movie.id) ||
+      seen.has(movie.id)
+    ) {
+      continue;
     }
+    seen.add(movie.id);
+    out.push(movie);
   }
   return out;
 }

@@ -21,7 +21,7 @@ const sampleMovie: Movie = {
 test('HeroCard loading and loaded states', () => {
   ReactTestRenderer.act(() => {
     const loading = ReactTestRenderer.create(
-      <HeroCard movie={null} onDetailsPress={() => {}} />,
+      <HeroCard loading movie={null} onDetailsPress={() => {}} />,
     );
     loading.unmount();
     const loaded = ReactTestRenderer.create(
@@ -51,6 +51,29 @@ test('HeroCard does not throw when overview is missing at runtime', () => {
     } as unknown as Movie;
     const tree = ReactTestRenderer.create(
       <HeroCard movie={movieMissingOverview} onDetailsPress={() => {}} />,
+    );
+    tree.unmount();
+  });
+});
+
+test('HeroCard shows load error and retry when loadErrorMessage is set', () => {
+  ReactTestRenderer.act(() => {
+    const tree = ReactTestRenderer.create(
+      <HeroCard
+        loadErrorMessage="Network down"
+        movie={null}
+        onDetailsPress={() => {}}
+        onRetryLoad={() => {}}
+      />,
+    );
+    tree.unmount();
+  });
+});
+
+test('HeroCard empty state when not loading and no movie', () => {
+  ReactTestRenderer.act(() => {
+    const tree = ReactTestRenderer.create(
+      <HeroCard loading={false} movie={null} onDetailsPress={() => {}} />,
     );
     tree.unmount();
   });

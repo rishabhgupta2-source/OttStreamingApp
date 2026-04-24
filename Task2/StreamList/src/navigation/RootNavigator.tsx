@@ -12,6 +12,7 @@ import {
 } from '../screens/DetailScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { SearchScreen } from '../screens/SearchScreen';
+import { SimilarFromWatchlistScreen } from '../screens/SimilarFromWatchlistScreen';
 import { WatchlistScreen } from '../screens/WatchlistScreen';
 import { useWatchlistStore } from '../store/watchlistStore';
 import { colors } from '../theme/colors';
@@ -49,6 +50,16 @@ const detailScreenOptions = {
     left: 'hidden' as const,
     right: 'hidden' as const,
   },
+};
+
+/**
+ * Similar list: avoid `detailScreenOptions` here — iOS-only `scrollEdgeEffects`
+ * mixed with this screen’s scroll body has caused intermittent blank surfaces on
+ * some Android + native-stack builds.
+ */
+const similarFromWatchlistScreenOptions = {
+  ...stackScreenOptions,
+  fullScreenGestureShadowEnabled: false,
 };
 
 const styles = StyleSheet.create({
@@ -154,6 +165,18 @@ function WatchlistScreenWithErrorBoundary(
   );
 }
 
+function SimilarFromWatchlistScreenWithErrorBoundary(
+  props: Readonly<
+    NativeStackScreenProps<WatchlistStackParamList, 'SimilarFromWatchlist'>
+  >,
+) {
+  return (
+    <ScreenErrorBoundary>
+      <SimilarFromWatchlistScreen {...props} />
+    </ScreenErrorBoundary>
+  );
+}
+
 function WatchlistStackNavigator() {
   return (
     <WatchlistStack.Navigator screenOptions={stackScreenOptions}>
@@ -166,6 +189,11 @@ function WatchlistStackNavigator() {
         component={DetailScreenWithErrorBoundary}
         name="Detail"
         options={detailScreenOptions}
+      />
+      <WatchlistStack.Screen
+        component={SimilarFromWatchlistScreenWithErrorBoundary}
+        name="SimilarFromWatchlist"
+        options={similarFromWatchlistScreenOptions}
       />
     </WatchlistStack.Navigator>
   );

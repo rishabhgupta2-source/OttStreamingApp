@@ -24,7 +24,8 @@ export type WatchlistGridProps = {
   onResetFilter: () => void;
 };
 
-function filterItems(
+/** Shared with `WatchlistScreen` so collection counts match the active filter. */
+export function getFilteredWatchlistItems(
   items: WatchlistItem[],
   activeFilter: WatchlistFilter,
 ): WatchlistItem[] {
@@ -45,7 +46,7 @@ export function WatchlistGrid({
   const removeItem = useWatchlistStore((state) => state.removeItem);
 
   const filteredItems = useMemo(
-    () => filterItems(items, activeFilter),
+    () => getFilteredWatchlistItems(items, activeFilter),
     [items, activeFilter],
   );
 
@@ -92,6 +93,7 @@ export function WatchlistGrid({
       columnWrapperStyle={styles.gridRow}
       data={filteredItems}
       keyExtractor={(item) => String(item.id)}
+      nestedScrollEnabled
       numColumns={2}
       renderItem={renderItem}
       scrollEnabled={false}

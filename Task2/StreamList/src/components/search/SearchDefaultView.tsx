@@ -7,11 +7,13 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
   useWindowDimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import type { Movie } from '../../api/types';
+import { TMDB_MOVIE_GENRE_ID_NAMES } from '../../constants/tmdbGenreNames';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
@@ -39,28 +41,6 @@ const TRENDING_GRID_SKELETON_KEYS = [
   'tg-5',
 ] as const;
 
-/** TMDB movie genre ids — mirrors API `/genre/movie/list` names for list-item `genre_ids`. */
-const TMDB_GENRE_ID_NAMES: GenreNameMap = {
-  28: 'Action',
-  12: 'Adventure',
-  16: 'Animation',
-  35: 'Comedy',
-  80: 'Crime',
-  99: 'Documentary',
-  18: 'Drama',
-  10751: 'Family',
-  14: 'Fantasy',
-  36: 'History',
-  27: 'Horror',
-  10402: 'Music',
-  9648: 'Mystery',
-  10749: 'Romance',
-  878: 'Sci-Fi',
-  53: 'Thriller',
-  10752: 'War',
-  37: 'Western',
-};
-
 const FEATURED_CARD_HEIGHT =
   spacing.content_card_width + spacing.huge;
 
@@ -73,6 +53,8 @@ export type SearchDefaultViewProps = {
   onGenreSelect: (genreName: string) => void;
   trendingMovies: Movie[];
   trendingLoading: boolean;
+  trendingError?: string | null;
+  onRetryTrending?: () => void;
   onCardPress: (movieId: number) => void;
 };
 
@@ -83,7 +65,7 @@ function formatFeaturedSubtitle(movie: Movie): string {
   const firstGenreId = movie.genre_ids?.[0];
   const genreName =
     firstGenreId !== undefined
-      ? TMDB_GENRE_ID_NAMES[firstGenreId]
+      ? TMDB_MOVIE_GENRE_ID_NAMES[firstGenreId]
       : undefined;
   if (genreName !== undefined && genreName.length > 0 && year.length > 0) {
     return `${genreName} • ${year}`;
@@ -104,6 +86,8 @@ export function SearchDefaultView({
   onGenreSelect,
   trendingMovies,
   trendingLoading,
+  trendingError = null,
+  onRetryTrending,
   onCardPress,
 }: SearchDefaultViewProps) {
   const { width: windowWidth } = useWindowDimensions();
@@ -118,8 +102,13 @@ export function SearchDefaultView({
     return raw > 0 ? raw : spacing.content_card_width;
   }, [windowWidth]);
 
+  const hasTrendingError =
+    trendingError !== null && trendingError.trim().length > 0;
+
   const showTrendingSection =
-    trendingLoading || trendingMovies.length > 0;
+    trendingLoading ||
+    trendingMovies.length > 0 ||
+    (hasTrendingError && !trendingLoading);
 
   const featuredMovie = trendingMovies[0];
   const featuredBackdropUri = useMemo(
@@ -147,7 +136,7 @@ export function SearchDefaultView({
   const renderGridItem = useCallback<ListRenderItem<Movie>>(
     ({ item }) => (
       <ContentCard
-        genreMap={TMDB_GENRE_ID_NAMES}
+        genreMap={TMDB_MOVIE_GENRE_ID_NAMES as GenreNameMap}
         includeBottomSpacing
         includeEndMargin={false}
         movie={item}
@@ -202,6 +191,26 @@ export function SearchDefaultView({
             Trending Now
           </Text>
 
+          {hasTrendingError && !trendingLoading ? (
+            <View style={styles.trendingErrorWrap}>
+              <Text style={[typography.body_md, styles.trendingErrorText]}>
+                {trendingError}
+              </Text>
+              {onRetryTrending !== undefined ? (
+                <TouchableOpacity
+                  accessibilityLabel="Retry loading trending movies"
+                  accessibilityRole="button"
+                  onPress={onRetryTrending}
+                  style={styles.trendingRetryWrap}
+                >
+                  <Text style={[typography.title_sm, styles.trendingRetryLabel]}>
+                    Try Again
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          ) : null}
+
           {showTrendingSkeleton ? (
             <>
               <View
@@ -229,7 +238,9 @@ export function SearchDefaultView({
             </>
           ) : null}
 
-          {!showTrendingSkeleton && featuredMovie !== undefined ? (
+          {!hasTrendingError &&
+          !showTrendingSkeleton &&
+          featuredMovie !== undefined ? (
             <>
               <Pressable
                 accessibilityLabel={`Featured: ${featuredMovie.title}`}
@@ -322,6 +333,21 @@ const styles = StyleSheet.create({
   },
   trendingBlock: {
     width: '100%',
+  },
+  trendingErrorWrap: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+  },
+  trendingErrorText: {
+    color: colors.on_surface_variant,
+    textAlign: 'center',
+  },
+  trendingRetryWrap: {
+    marginTop: spacing.md,
+  },
+  trendingRetryLabel: {
+    color: colors.primary_container,
   },
   trendingTitle: {
     color: colors.on_surface,

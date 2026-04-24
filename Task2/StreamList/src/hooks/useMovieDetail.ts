@@ -14,6 +14,20 @@ function filterTopBilledCast(cast: Cast[]): Cast[] {
     .filter((member) => member.order < 10);
 }
 
+/** Stable order, first occurrence wins — TMDB should not repeat ids, but keys stay unique. */
+function uniqMoviesById(movies: Movie[]): Movie[] {
+  const seen = new Set<number>();
+  const out: Movie[] = [];
+  for (const m of movies) {
+    if (typeof m.id !== 'number' || !Number.isFinite(m.id) || seen.has(m.id)) {
+      continue;
+    }
+    seen.add(m.id);
+    out.push(m);
+  }
+  return out;
+}
+
 export type UseMovieDetailResult = {
   detail: {
     data: MovieDetail | null;
@@ -54,6 +68,8 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
 
   const latestMovieIdRef = useRef(movieId);
   latestMovieIdRef.current = movieId;
+
+  const detailRefetchInFlightRef = useRef(false);
 
   useEffect(() => {
     const id = movieId;
@@ -99,7 +115,9 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
 
       if (similarResult.status === 'fulfilled') {
         const rawResults = similarResult.value.results;
-        setSimilar(Array.isArray(rawResults) ? rawResults : []);
+        setSimilar(
+          uniqMoviesById(Array.isArray(rawResults) ? rawResults : []),
+        );
       } else {
         setSimilarError(getErrorMessage(similarResult.reason));
       }
@@ -116,8 +134,13 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
   }, [movieId]);
 
   const refetchDetail = useCallback(() => {
+    if (detailRefetchInFlightRef.current) {
+      return;
+    }
+    detailRefetchInFlightRef.current = true;
     const id = movieId;
     setDetailLoading(true);
+    setDetailError(null);
     getMovieDetail(id)
       .then((value) => {
         if (latestMovieIdRef.current !== id) {
@@ -134,6 +157,7 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
         setDetailError(getErrorMessage(reason));
       })
       .finally(() => {
+        detailRefetchInFlightRef.current = false;
         if (latestMovieIdRef.current === id) {
           setDetailLoading(false);
         }
@@ -176,7 +200,7 @@ export function useMovieDetail(movieId: number): UseMovieDetailResult {
           return;
         }
         const rawResults = value.results;
-        setSimilar(Array.isArray(rawResults) ? rawResults : []);
+        setSimilar(uniqMoviesById(Array.isArray(rawResults) ? rawResults : []));
         setSimilarError(null);
       })
       .catch((reason: unknown) => {

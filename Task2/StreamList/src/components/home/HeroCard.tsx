@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
   useWindowDimensions,
 } from 'react-native';
@@ -20,16 +21,54 @@ const HERO_WIDTH_RATIO = 0.9;
 export type HeroCardProps = {
   movie: Movie | null;
   onDetailsPress: (movieId: number) => void;
+  /** True while the first trending page is loading (no poster yet, no error). */
+  loading?: boolean;
+  /** When set, show error + retry instead of skeleton or hero. */
+  loadErrorMessage?: string | null;
+  onRetryLoad?: () => void;
 };
 
-export function HeroCard({ movie, onDetailsPress }: HeroCardProps) {
+export function HeroCard({
+  movie,
+  onDetailsPress,
+  loading = false,
+  loadErrorMessage = null,
+  onRetryLoad,
+}: HeroCardProps) {
   const { width: windowWidth } = useWindowDimensions();
   const cardWidth = useMemo(
     () => windowWidth * HERO_WIDTH_RATIO,
     [windowWidth],
   );
 
-  if (movie === null) {
+  const hasLoadError =
+    loadErrorMessage !== null && loadErrorMessage.trim().length > 0;
+
+  if (hasLoadError) {
+    return (
+      <View style={[styles.cardOuter, { width: cardWidth }]}>
+        <View style={styles.heroMessageBlock}>
+          <Text style={[typography.body_md, styles.heroMessageText]}>
+            {loadErrorMessage}
+          </Text>
+          {onRetryLoad !== undefined ? (
+            <TouchableOpacity
+              accessibilityLabel="Retry loading featured movie"
+              accessibilityRole="button"
+              onPress={onRetryLoad}
+              style={styles.heroRetryWrap}
+            >
+              <Text style={[typography.title_sm, styles.heroRetryLabel]}>
+                Try Again
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      </View>
+    );
+  }
+
+  if (movie === null && loading) {
     return (
       <View style={[styles.cardOuter, { width: cardWidth }]}>
         <SkeletonCard
@@ -37,6 +76,18 @@ export function HeroCard({ movie, onDetailsPress }: HeroCardProps) {
           showCaptionSkeletons={false}
           width={cardWidth}
         />
+      </View>
+    );
+  }
+
+  if (movie === null) {
+    return (
+      <View style={[styles.cardOuter, { width: cardWidth }]}>
+        <View style={styles.heroMessageBlock}>
+          <Text style={[typography.body_md, styles.heroMessageText]}>
+            No trending movies to show right now.
+          </Text>
+        </View>
       </View>
     );
   }
@@ -79,7 +130,9 @@ export function HeroCard({ movie, onDetailsPress }: HeroCardProps) {
           <Pressable
             accessibilityLabel="Watch now"
             accessibilityRole="button"
-            onPress={() => {}}
+            onPress={() => {
+              onDetailsPress(movie.id);
+            }}
             style={styles.watchNowPressable}
           >
             <LinearGradient
@@ -208,5 +261,22 @@ const styles = StyleSheet.create({
   },
   detailsLabel: {
     color: colors.on_surface,
+  },
+  heroMessageBlock: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: spacing.hero_backdrop_height,
+  },
+  heroMessageText: {
+    color: colors.on_surface_variant,
+    textAlign: 'center',
+  },
+  heroRetryWrap: {
+    marginTop: spacing.lg,
+  },
+  heroRetryLabel: {
+    color: colors.primary_container,
   },
 });

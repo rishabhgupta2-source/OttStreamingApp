@@ -172,3 +172,43 @@ test('fulfilled similar with missing results yields empty similar list', async (
 
   unmount();
 });
+
+test('similar results dedupe duplicate movie ids', async () => {
+  const movieA: Movie = {
+    id: 99,
+    title: 'First',
+    poster_path: null,
+    backdrop_path: null,
+    vote_average: 6,
+    release_date: '2010-01-01',
+    genre_ids: [28],
+    overview: 'A',
+  };
+  const movieB: Movie = {
+    id: 100,
+    title: 'Second',
+    poster_path: null,
+    backdrop_path: null,
+    vote_average: 7,
+    release_date: '2011-01-01',
+    genre_ids: [12],
+    overview: 'B',
+  };
+  mockGetMovieDetail.mockResolvedValue(sampleDetail);
+  mockGetMovieCredits.mockResolvedValue(emptyCredits);
+  mockGetSimilarMovies.mockResolvedValue({
+    page: 1,
+    total_pages: 1,
+    total_results: 3,
+    results: [movieA, { ...movieA, title: 'Duplicate row' }, movieB],
+  });
+
+  const { getLatest, unmount } = mountUseMovieDetail(1);
+  await act(async () => {
+    await flushMicrotasks();
+  });
+
+  expect(getLatest().similar.data).toEqual([movieA, movieB]);
+
+  unmount();
+});

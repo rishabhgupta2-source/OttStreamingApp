@@ -22,20 +22,26 @@ export type SearchResultsGridProps = {
   query: string;
   results: Movie[];
   loading: boolean;
+  loadingMore?: boolean;
   totalResults: number;
   error: string | null;
   onRetry: () => void;
   onCardPress: (id: number) => void;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 };
 
 export function SearchResultsGrid({
   query,
   results,
   loading,
+  loadingMore = false,
   totalResults,
   error,
   onRetry,
   onCardPress,
+  hasMore = false,
+  onLoadMore,
 }: SearchResultsGridProps) {
   const { width: windowWidth } = useWindowDimensions();
 
@@ -48,7 +54,7 @@ export function SearchResultsGrid({
   const showError = error !== null && trimmedQuery.length > 0;
   const showCount = results.length > 0;
   const showSkeletonGrid =
-    !showError && loading && results.length === 0;
+    !showError && !loadingMore && loading && results.length === 0;
   const showResultsGrid = results.length > 0;
   const showZeroState =
     !showError &&
@@ -101,7 +107,7 @@ export function SearchResultsGrid({
 
       {showCount ? (
         <Text style={styles.resultCount}>
-          {`${String(totalResults)} results for '${query}'`}
+          {`${String(totalResults)} results for '${trimmedQuery}'`}
         </Text>
       ) : null}
 
@@ -125,6 +131,26 @@ export function SearchResultsGrid({
           renderItem={renderMovieItem}
           scrollEnabled={false}
         />
+      ) : null}
+
+      {showResultsGrid && hasMore && onLoadMore !== undefined ? (
+        <View style={styles.loadMoreWrap}>
+          {loadingMore ? (
+            <Text style={styles.loadMoreLoading}>Loading more…</Text>
+          ) : (
+            <Pressable
+              accessibilityLabel="Load more search results"
+              accessibilityRole="button"
+              hitSlop={spacing.sm}
+              onPress={onLoadMore}
+              style={styles.loadMorePressable}
+            >
+              <Text style={[typography.title_sm, styles.loadMoreLabel]}>
+                Load more results
+              </Text>
+            </Pressable>
+          )}
+        </View>
       ) : null}
 
       {showZeroState ? (
@@ -200,5 +226,23 @@ const styles = StyleSheet.create({
     color: colors.on_surface_variant,
     marginTop: spacing.sm,
     textAlign: 'center',
+  },
+  loadMoreWrap: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
+  },
+  loadMorePressable: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+  },
+  loadMoreLabel: {
+    color: colors.primary_container,
+    textTransform: 'uppercase',
+  },
+  loadMoreLoading: {
+    ...typography.label_sm,
+    color: colors.on_surface_variant,
   },
 });

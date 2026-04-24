@@ -7,6 +7,10 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import {
+  TMDB_MOVIE_GENRE_ID_NAMES,
+  TMDB_TV_GENRE_ID_NAMES,
+} from '../../constants/tmdbGenreNames';
 import type { WatchlistItem } from '../../store/watchlistStore';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
@@ -29,7 +33,12 @@ function releaseYear(releaseDate: string): string {
 function formatSubtitle(item: WatchlistItem): string {
   const year = releaseYear(item.releaseDate);
   const firstId = item.genreIds[0];
-  const genrePart = firstId !== undefined ? String(firstId) : '';
+  const genreMap =
+    item.mediaType === 'tv' ? TMDB_TV_GENRE_ID_NAMES : TMDB_MOVIE_GENRE_ID_NAMES;
+  const genreName =
+    firstId !== undefined ? genreMap[firstId] : undefined;
+  const genrePart =
+    genreName !== undefined && genreName.length > 0 ? genreName : '';
   if (year.length > 0 && genrePart.length > 0) {
     return `${year} • ${genrePart}`;
   }
@@ -54,6 +63,7 @@ export function WatchlistCard({
   onRemove,
   onDetailsPress,
 }: WatchlistCardProps) {
+  const showDetails = item.mediaType === 'movie';
   const { width: windowWidth } = useWindowDimensions();
   const cardWidth = useMemo(
     () => windowWidth / 2 - spacing.xxl,
@@ -113,17 +123,25 @@ export function WatchlistCard({
             {subtitle}
           </Text>
         ) : null}
-        <TouchableOpacity
-          accessibilityLabel="View details"
-          accessibilityRole="button"
-          activeOpacity={0.85}
-          onPress={() => {
-            onDetailsPress(item.id);
-          }}
-          style={styles.detailsButton}
-        >
-          <Text style={styles.detailsLabel}>Details</Text>
-        </TouchableOpacity>
+        {showDetails ? (
+          <TouchableOpacity
+            accessibilityLabel="View details"
+            accessibilityRole="button"
+            activeOpacity={0.85}
+            onPress={() => {
+              onDetailsPress(item.id);
+            }}
+            style={styles.detailsButton}
+          >
+            <Text style={styles.detailsLabel}>Details</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.detailsPlaceholder} accessibilityElementsHidden>
+            <Text style={styles.detailsUnavailableLabel}>
+              Details not available for series
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -217,5 +235,20 @@ const styles = StyleSheet.create({
   detailsLabel: {
     ...typography.title_sm,
     color: colors.on_surface,
+  },
+  detailsPlaceholder: {
+    width: '100%',
+    height: spacing.detail_hero_title_skeleton_height,
+    marginTop: spacing.sm,
+    borderRadius: spacing.sm,
+    backgroundColor: colors.surface_container,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  detailsUnavailableLabel: {
+    ...typography.label_sm,
+    color: colors.on_surface_variant,
+    textAlign: 'center',
+    paddingHorizontal: spacing.sm,
   },
 });

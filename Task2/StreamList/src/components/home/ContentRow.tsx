@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import type { Movie } from '../../api/types';
@@ -24,6 +25,8 @@ export type ContentRowProps = {
   loadMore: () => void;
   onCardPress: (movieId: number) => void;
   genreMap?: GenreNameMap;
+  error?: string | null;
+  onRetry?: () => void;
 };
 
 export function ContentRow({
@@ -34,9 +37,18 @@ export function ContentRow({
   loadMore,
   onCardPress,
   genreMap,
+  error = null,
+  onRetry,
 }: ContentRowProps) {
-  const showSkeletonRow = loading && data.length === 0;
-  const showEmptyState = !loading && data.length === 0;
+  const hasErrorMessage = error !== null && error.trim().length > 0;
+  const showSkeletonRow =
+    loading && data.length === 0 && !hasErrorMessage;
+  const showErrorState =
+    hasErrorMessage && data.length === 0 && !loading;
+  const showEmptyState =
+    !loading && !hasErrorMessage && data.length === 0;
+  const showLoadMoreError =
+    hasErrorMessage && data.length > 0 && !loading;
 
   const keyExtractor = useCallback((item: Movie) => String(item.id), []);
 
@@ -63,7 +75,6 @@ export function ContentRow({
     <View style={styles.section}>
       <View style={styles.header}>
         <Text style={[typography.headline_md, styles.title]}>{title}</Text>
-        <Text style={[typography.title_sm, styles.seeAll]}>See All</Text>
       </View>
 
       {showSkeletonRow ? (
@@ -82,6 +93,24 @@ export function ContentRow({
         </ScrollView>
       ) : null}
 
+      {showErrorState ? (
+        <View style={styles.emptyWrap}>
+          <Text style={[typography.body_md, styles.emptyText]}>{error}</Text>
+          {onRetry !== undefined ? (
+            <TouchableOpacity
+              accessibilityLabel={`Retry loading ${title}`}
+              accessibilityRole="button"
+              onPress={onRetry}
+              style={styles.retryWrap}
+            >
+              <Text style={[typography.title_sm, styles.retryLabel]}>
+                Try Again
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      ) : null}
+
       {showEmptyState ? (
         <View style={styles.emptyWrap}>
           <Text style={[typography.body_md, styles.emptyText]}>
@@ -90,12 +119,33 @@ export function ContentRow({
         </View>
       ) : null}
 
-      {!showSkeletonRow && !showEmptyState ? (
+      {showLoadMoreError ? (
+        <View style={styles.inlineErrorWrap}>
+          <Text style={[typography.body_md, styles.inlineErrorText]}>
+            {error}
+          </Text>
+          {onRetry !== undefined ? (
+            <TouchableOpacity
+              accessibilityLabel={`Retry ${title}`}
+              accessibilityRole="button"
+              onPress={onRetry}
+              style={styles.retryWrap}
+            >
+              <Text style={[typography.title_sm, styles.retryLabel]}>
+                Try Again
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      ) : null}
+
+      {!showSkeletonRow && !showEmptyState && !showErrorState ? (
         <FlatList
           contentContainerStyle={styles.listContent}
           data={data}
           horizontal
           keyExtractor={keyExtractor}
+          nestedScrollEnabled
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.3}
           renderItem={renderItem}
@@ -113,16 +163,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xl,
     paddingBottom: spacing.md,
   },
   title: {
     color: colors.on_surface,
-  },
-  seeAll: {
-    color: colors.primary_container,
   },
   skeletonScrollContent: {
     flexDirection: 'row',
@@ -141,6 +188,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyText: {
+    color: colors.on_surface_variant,
+    textAlign: 'center',
+  },
+  retryWrap: {
+    marginTop: spacing.md,
+  },
+  retryLabel: {
+    color: colors.primary_container,
+    textAlign: 'center',
+  },
+  inlineErrorWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+  inlineErrorText: {
     color: colors.on_surface_variant,
     textAlign: 'center',
   },

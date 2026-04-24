@@ -14,6 +14,7 @@ export type SearchStackParamList = {
 export type WatchlistStackParamList = {
   WatchlistMain: undefined;
   Detail: { movieId: number };
+  SimilarFromWatchlist: { movieId: number; sourceTitle: string };
 };
 
 /** Params for `Detail` — identical on Home, Search, and Watchlist stacks. */

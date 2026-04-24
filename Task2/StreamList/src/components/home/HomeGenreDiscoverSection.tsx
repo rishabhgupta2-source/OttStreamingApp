@@ -30,11 +30,13 @@ export function HomeGenreDiscoverSection({
   return (
     <ContentRow
       data={row.data}
+      error={row.error}
       genreMap={genreMap}
       hasMore={row.hasMore}
       loadMore={row.loadMore}
       loading={row.loading}
       onCardPress={onCardPress}
+      onRetry={row.refetch}
       title={title}
     />
   );

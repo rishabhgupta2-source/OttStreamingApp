@@ -157,6 +157,7 @@ export function CastSection({
         data={cast}
         horizontal
         keyExtractor={keyExtractor}
+        nestedScrollEnabled
         renderItem={renderCastItem}
         showsHorizontalScrollIndicator={false}
       />

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   type ListRenderItem,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,38 +19,60 @@ import { SkeletonCard } from '../common/SkeletonCard';
 
 const SKELETON_COUNT = 4;
 
+function dedupeMoviesById(movies: Movie[]): Movie[] {
+  const seen = new Set<number>();
+  const out: Movie[] = [];
+  for (const m of movies) {
+    if (seen.has(m.id)) {
+      continue;
+    }
+    seen.add(m.id);
+    out.push(m);
+  }
+  return out;
+}
+
 export type BecauseSavedRowProps = {
   mostRecentItem: WatchlistItem;
   onCardPress: (movieId: number) => void;
+  onViewAllPress?: () => void;
 };
 
 export function BecauseSavedRow({
   mostRecentItem,
   onCardPress,
+  onViewAllPress,
 }: BecauseSavedRowProps) {
   const isMovie = mostRecentItem.mediaType === 'movie';
   const [similar, setSimilar] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(isMovie);
+  const [error, setError] = useState<string | null>(null);
+  const [refetchToken, setRefetchToken] = useState(0);
 
   useEffect(() => {
     if (!isMovie) {
       setSimilar([]);
       setLoading(false);
+      setError(null);
       return;
     }
     let cancelled = false;
     setLoading(true);
+    setError(null);
     setSimilar([]);
     getSimilarMovies(mostRecentItem.id)
       .then((res) => {
         if (!cancelled) {
           const rows = Array.isArray(res.results) ? res.results : [];
-          setSimilar(rows);
+          setSimilar(dedupeMoviesById(rows));
         }
       })
       .catch(() => {
         if (!cancelled) {
           setSimilar([]);
+          setError(
+            'Could not load suggestions. Check your connection and try again.',
+          );
         }
       })
       .finally(() => {
@@ -60,7 +83,7 @@ export function BecauseSavedRow({
     return () => {
       cancelled = true;
     };
-  }, [isMovie, mostRecentItem.id]);
+  }, [isMovie, mostRecentItem.id, refetchToken]);
 
   const keyExtractor = useCallback((item: Movie) => String(item.id), []);
 
@@ -84,16 +107,31 @@ export function BecauseSavedRow({
     return null;
   }
 
-  if (!loading && similar.length === 0) {
+  if (!loading && similar.length === 0 && error === null) {
     return null;
   }
+
+  const viewAllControl =
+    onViewAllPress !== undefined ? (
+      <Pressable
+        accessibilityLabel="View all similar titles"
+        accessibilityRole="button"
+        hitSlop={spacing.sm}
+        onPress={onViewAllPress}
+        style={({ pressed }) => [pressed ? styles.viewAllPressed : null]}
+      >
+        <Text style={styles.viewAll}>View All</Text>
+      </Pressable>
+    ) : (
+      <Text style={styles.viewAll}>View All</Text>
+    );
 
   const header = (
     <View style={styles.header}>
       <Text numberOfLines={1} style={styles.headerTitle}>
         {`Because you saved ${mostRecentItem.title}`}
       </Text>
-      <Text style={styles.viewAll}>View All</Text>
+      {viewAllControl}
     </View>
   );
 
@@ -118,6 +156,28 @@ export function BecauseSavedRow({
     );
   }
 
+  if (error !== null) {
+    return (
+      <View style={styles.section}>
+        {header}
+        <View style={styles.errorBlock}>
+          <Text style={styles.errorText}>{error}</Text>
+          <Pressable
+            accessibilityLabel="Retry loading suggestions"
+            accessibilityRole="button"
+            hitSlop={spacing.sm}
+            onPress={() => {
+              setRefetchToken((t) => t + 1);
+            }}
+            style={styles.retryPressable}
+          >
+            <Text style={styles.retryLabel}>Retry</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.section}>
       {header}
@@ -126,6 +186,7 @@ export function BecauseSavedRow({
         data={similar}
         horizontal
         keyExtractor={keyExtractor}
+        nestedScrollEnabled
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.3}
         renderItem={renderItem}
@@ -157,6 +218,28 @@ const styles = StyleSheet.create({
   viewAll: {
     ...typography.title_sm,
     color: colors.primary_container,
+  },
+  viewAllPressed: {
+    opacity: 0.7,
+  },
+  errorBlock: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    alignItems: 'flex-start',
+  },
+  errorText: {
+    ...typography.body_md,
+    color: colors.on_surface_variant,
+  },
+  retryPressable: {
+    marginTop: spacing.md,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+  },
+  retryLabel: {
+    ...typography.title_sm,
+    color: colors.primary_container,
+    textTransform: 'uppercase',
   },
   skeletonScrollContent: {
     flexDirection: 'row',

@@ -32,5 +32,17 @@ test('GenreFilterStrip renders loading skeletons then genres', () => {
       />,
     );
     loaded.unmount();
+
+    const failed = ReactTestRenderer.create(
+      <GenreFilterStrip
+        error="Genres failed"
+        genres={[]}
+        loading={false}
+        selectedGenreId={null}
+        onRetry={() => {}}
+        onSelectGenre={() => {}}
+      />,
+    );
+    failed.unmount();
   });
 });

@@ -32,7 +32,7 @@ export function useHome() {
     () => getGenres().then((response) => response.genres),
     [],
     EMPTY_GENRES,
-    true,
+    false,
   );
 
   const trending = usePaginatedMovieList('trending', (page) =>

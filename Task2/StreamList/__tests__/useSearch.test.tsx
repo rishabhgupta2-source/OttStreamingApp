@@ -257,6 +257,69 @@ test('search API error exposes message and clears results', async () => {
   unmount();
 });
 
+test('loadMoreSearch fetches the next page and appends results', async () => {
+  const page1Movie: Movie = {
+    id: 1,
+    title: 'One',
+    poster_path: null,
+    backdrop_path: null,
+    vote_average: 7,
+    release_date: '2020-01-01',
+    genre_ids: [28],
+    overview: '',
+  };
+  const page2Movie: Movie = {
+    id: 2,
+    title: 'Two',
+    poster_path: null,
+    backdrop_path: null,
+    vote_average: 6,
+    release_date: '2021-01-01',
+    genre_ids: [35],
+    overview: '',
+  };
+  mockSearchMovies
+    .mockResolvedValueOnce({
+      page: 1,
+      total_pages: 2,
+      total_results: 2,
+      results: [page1Movie],
+    })
+    .mockResolvedValueOnce({
+      page: 2,
+      total_pages: 2,
+      total_results: 2,
+      results: [page2Movie],
+    });
+
+  const { getLatest, unmount } = mountUseSearch();
+
+  await act(async () => {
+    getLatest().runSearchNow('find');
+  });
+  await act(async () => {
+    await flushMicrotasks();
+  });
+
+  expect(getLatest().results).toHaveLength(1);
+  expect(getLatest().hasMore).toBe(true);
+
+  await act(async () => {
+    await getLatest().loadMoreSearch();
+  });
+  await act(async () => {
+    await flushMicrotasks();
+  });
+
+  expect(mockSearchMovies).toHaveBeenCalledTimes(2);
+  expect(mockSearchMovies.mock.calls[1][1]).toBe(2);
+  expect(getLatest().results).toHaveLength(2);
+  expect(getLatest().hasMore).toBe(false);
+  expect(getLatest().loadingMore).toBe(false);
+
+  unmount();
+});
+
 test('retrySearch invokes search again after error', async () => {
   mockSearchMovies
     .mockRejectedValueOnce(new Error('Temporary'))

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { NativeSyntheticEvent, TextLayoutEventData } from 'react-native';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
@@ -18,10 +19,12 @@ export function SynopsisSection({
   loading,
 }: SynopsisSectionProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
   const opacity = useRef(new Animated.Value(SHIMMER_MIN_OPACITY)).current;
 
   useEffect(() => {
     setExpanded(false);
+    setShowReadMore(false);
   }, [overview]);
 
   useEffect(() => {
@@ -66,6 +69,16 @@ export function SynopsisSection({
     setExpanded(false);
   }, []);
 
+  const onMeasureTextLayout = useCallback(
+    (e: NativeSyntheticEvent<TextLayoutEventData>) => {
+      if (expanded) {
+        return;
+      }
+      setShowReadMore(e.nativeEvent.lines.length > 3);
+    },
+    [expanded],
+  );
+
   if (loading) {
     return (
       <View style={styles.root}>
@@ -103,7 +116,17 @@ export function SynopsisSection({
       {isEmpty ? (
         <Text style={styles.emptyBody}>No synopsis available.</Text>
       ) : (
-        <>
+        <View style={styles.bodyBlock}>
+          {!expanded ? (
+            <Text
+              importantForAccessibility="no"
+              onTextLayout={onMeasureTextLayout}
+              pointerEvents="none"
+              style={[styles.body, styles.bodyMeasure]}
+            >
+              {overview}
+            </Text>
+          ) : null}
           <Text
             style={styles.body}
             numberOfLines={expanded ? undefined : 3}
@@ -119,7 +142,7 @@ export function SynopsisSection({
             >
               <Text style={styles.toggleText}>Show less</Text>
             </Pressable>
-          ) : (
+          ) : showReadMore ? (
             <Pressable
               accessibilityLabel="Read more synopsis"
               accessibilityRole="button"
@@ -128,8 +151,8 @@ export function SynopsisSection({
             >
               <Text style={styles.toggleText}>Read more</Text>
             </Pressable>
-          )}
-        </>
+          ) : null}
+        </View>
       )}
     </View>
   );
@@ -138,6 +161,17 @@ export function SynopsisSection({
 const styles = StyleSheet.create({
   root: {
     width: '100%',
+  },
+  bodyBlock: {
+    position: 'relative',
+    width: '100%',
+  },
+  bodyMeasure: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    opacity: 0,
   },
   label: {
     ...typography.headline_md,

@@ -5,7 +5,7 @@ import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-const DEFAULT_PLACEHOLDER = 'Search movies, actors, directors...';
+const DEFAULT_PLACEHOLDER = 'Search movies by title…';
 
 const SEARCH_ICON_SIZE = typography.title_lg.fontSize;
 
