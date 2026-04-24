@@ -3008,6 +3008,12 @@ _**Agent (default)**_
 ```bash
 cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master
 ```
+
+```
+To https://github.com/rishabhgupta2-source/OttStreamingApp.git
+   d1b3a0d..36d04c6  master -&gt; master
+
+```
 </details>
 </tool-use>
 
@@ -3015,3 +3021,191 @@ cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master
 <summary>Tool use: **run_terminal_command_v2**</summary>
 
 </details></tool-use>
+
+_**Agent (default)**_
+
+### Done
+- **Committed** on `master`: `36d04c6` — *fix(StreamList): remove Detail overlay on Android and iOS stack dimming*
+- **Pushed** to `origin/master` (`https://github.com/rishabhgupta2-source/OttStreamingApp.git`)
+
+### Included in the commit
+- `Task2/StreamList/src/navigation/RootNavigator.tsx`
+- `Task2/StreamList/src/screens/DetailScreen.tsx`
+- `Task2/StreamList/src/navigation/StreamListTabBarBackground.tsx` (new)
+
+### Not committed (still local)
+- `.DS_Store`, `Task2/.DS_Store` — noise, should stay out of git
+- `.specstory/history/*`, `.specstory/statistics.json` — IDE/chat tracking, unrelated to the app fix
+
+If you want those specstory files committed too, say so and we can add a follow-up commit.
+
+---
+
+_**User**_
+
+still the changes are present these one also want to commit with proper msg and push 
+
+---
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git status</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git status
+```
+
+```
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
+	modified:   .specstory/history/2026-04-20_09-40-31Z-feature-breakdown-files-in-readme.md
+	modified:   .specstory/statistics.json
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+	.DS_Store
+	.specstory/history/2026-04-23_06-18-22Z-project-api-documentation.md
+	.specstory/history/2026-04-23_07-30-11Z-detail-screen-shadow-removal.md
+	Task2/.DS_Store
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+<think><details><summary>Thought Process</summary>
+**Committing changes**
+
+I'm committing .specstory/history/*.md and .specstory/statistics.json, excluding .DS_Store files as per best practices. I'm committing .specstory/ directory with a proper commit message, excluding DS_Store files as per industry standard. </details></think>
+
+_**Agent (default)**_
+
+Committing `.specstory` updates only — excluding `.DS_Store` (macOS junk; shouldn't be in the repo).
+
+
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git add .specstory/history/2026-04-20_09-40-31Z-feature-breakdown-files-in-readme.md .specstory/history/2026-04-23_06-18-22Z-project-api-documentation.md .specstory/history/2026-04-23_07-30-11Z-detail-screen-shadow-removal.md .specstory/statistics.json && git commit --trailer "Made-with: Cursor" -m "chore(specstory): sync history transcripts and statistics
+
+- Update feature-breakdown readme transcript and statistics.
+- Add project API documentation and Detail screen shadow-removal session logs."</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git add .specstory/history/2026-04-20_09-40-31Z-feature-breakdown-files-in-readme.md .specstory/history/2026-04-23_06-18-22Z-project-api-documentation.md .specstory/history/2026-04-23_07-30-11Z-detail-screen-shadow-removal.md .specstory/statistics.json && git commit --trailer "Made-with: Cursor" -m "chore(specstory): sync history transcripts and statistics
+
+- Update feature-breakdown readme transcript and statistics.
+- Add project API documentation and Detail screen shadow-removal session logs."
+```
+
+```
+[master 0bb480d] chore(specstory): sync history transcripts and statistics
+ Committer: Rishabh Gupta &lt;rishabhgupta@Rishabh-Guptas-MacBook-Pro.local&gt;
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 4 files changed, 4478 insertions(+), 73 deletions(-)
+ create mode 100644 .specstory/history/2026-04-23_06-18-22Z-project-api-documentation.md
+ create mode 100644 .specstory/history/2026-04-23_07-30-11Z-detail-screen-shadow-removal.md
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git push origin master
+```
+
+```
+To https://github.com/rishabhgupta2-source/OttStreamingApp.git
+   36d04c6..0bb480d  master -&gt; master
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git status</summary>
+
+```bash
+cd /Users/rishabhgupta/ReactCursor/OttStreamingApp && git status
+```
+
+```
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+	.DS_Store
+	Task2/.DS_Store
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+```
+</details>
+</tool-use>
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2"><details>
+<summary>Tool use: **run_terminal_command_v2**</summary>
+
+</details></tool-use>
+
+_**Agent (default)**_
+
+### Committed and pushed
+- **Commit:** `0bb480d` — `chore(specstory): sync history transcripts and statistics`
+- **Remote:** `origin/master` updated (`36d04c6..0bb480d`)
+
+### Files in this commit
+| Path | Change |
+|------|--------|
+| `.specstory/history/2026-04-20_09-40-31Z-feature-breakdown-files-in-readme.md` | modified |
+| `.specstory/statistics.json` | modified |
+| `.specstory/history/2026-04-23_06-18-22Z-project-api-documentation.md` | added |
+| `.specstory/history/2026-04-23_07-30-11Z-detail-screen-shadow-removal.md` | added |
+
+### Left untracked on purpose
+- `.DS_Store` and `Task2/.DS_Store` — Finder metadata; usually not committed. I can add them to `.gitignore` in a small follow-up if you want.
+
+Working tree is clean aside from those two untracked files.
